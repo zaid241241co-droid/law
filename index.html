@@ -255,7 +255,7 @@ async function signup(){
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const accessCode = document.getElementById("accessCode").value;
+  const accessCode = document.getElementById("accessCode").value.trim();
 
   // Check access code
   const { data: codeData, error: codeError } = await client
@@ -265,10 +265,11 @@ async function signup(){
     .eq("used", false)
     .single();
 
-  if(codeError || !codeData){
-    alert("Invalid or already used access code");
-    return;
-  }
+ if(codeError || !codeData){
+  console.log(codeError);
+  alert("Invalid or already used access code");
+  return;
+}
 
   // Signup
   const { data: signUpData, error } = await client.auth.signUp({
