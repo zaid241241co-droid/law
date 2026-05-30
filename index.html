@@ -187,6 +187,7 @@ button{
 
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
+    <input id="accessCode" placeholder="Access Code">
 
     <button onclick="signup()">Signup</button>
     <button onclick="login()">Login</button>
@@ -251,13 +252,45 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* AUTH */
 async function signup(){
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const accessCode = document.getElementById("accessCode").value;
 
-  const { error } = await client.auth.signUp({ email, password });
+  // Check access code
+  const { data: codeData, error: codeError } = await client
+    .from("access_codes")
+    .select("*")
+    .eq("code", accessCode)
+    .eq("used", false)
+    .single();
 
-  if(error) alert(error.message);
-  else alert("Signup success → now login");
+  if(codeError || !codeData){
+    alert("Invalid or already used access code");
+    return;
+  }
+
+  // Signup
+  const { data: signUpData, error } = await client.auth.signUp({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  // Mark code as used
+  await client
+    .from("access_codes")
+    .update({
+      used: true,
+      used_by: signUpData.user?.id
+    })
+    .eq("id", codeData.id);
+
+  alert("Signup successful. Verify email and then login.");
 }
 
 async function login(){
