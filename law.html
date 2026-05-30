@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lawyer Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  font-family:Poppins;
+  margin:0;
+  background:#f4f7fc;
+}
+
+.center{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.box{
+  background:white;
+  padding:35px;
+  border-radius:14px;
+  width:360px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.1);
+  transition:0.3s ease;
+}
+
+/* Hover effect */
+.box:hover{
+  transform:scale(1.03);
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Inputs */
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:1px solid #ddd;
+  border-radius:6px;
+  outline:none;
+}
+
+/* Button hover golden effect */
+button{
+  width:100%;
+  padding:12px;
+  background:#071a3d;
+  color:white;
+  border:none;
+  cursor:pointer;
+  border-radius:6px;
+  transition:0.3s ease;
+   margin-top:8px;
+}
+
+button:hover{
+  background:gold;
+  color:black;
+  transform:scale(1.02);
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+}
+
+#app{
+  display:none;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logout{
+  background:red;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+<div class="center" id="authBox">
+  <div class="box">
+    <h3>Lawyer Login</h3>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="signup()">Signup</button>
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <h2>Advocate Dashboard</h2>
+
+  <button class="logout" onclick="logout()">Logout</button>
+
+  <h3>Add Case</h3>
+
+  <input id="name" placeholder="Client Name">
+  <input id="caseType" placeholder="Case Type">
+  <input id="status" placeholder="Status">
+
+  <button onclick="insertCase()">Add Case</button>
+
+  <h3>Your Cases</h3>
+  <div id="cases"></div>
+
+  <h3>Case Overview</h3>
+<canvas id="caseChart" width="300" height="300"></canvas>
+
+  <h3>Add Hearing</h3>
+
+<input id="hearingCaseId" placeholder="Case ID">
+<input id="hearingDate" type="date">
+<input id="courtName" placeholder="Court Name">
+<input id="hearingStatus" placeholder="Status">
+<input id="hearingNotes" placeholder="Notes">
+
+<button onclick="addHearing()">Add Hearing</button>
+
+<h3>Hearings</h3>
+<div id="hearings"></div>
+
+<h3>Upload Document</h3>
+
+<input id="docCaseId" placeholder="Case ID">
+<input id="fileUpload" type="file">
+
+<button onclick="uploadDocument()">Upload</button>
+
+<h3>Documents</h3>
+<div id="documents"></div>
+
+</div>
+
+<script>
+
+/* SUPABASE */
+const SUPABASE_URL = "https://icubannrfuawithpnxil.supabase.co";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdWJhbm5yZnVhd2l0aHBueGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzAwNjAsImV4cCI6MjA5NTY0NjA2MH0.o7lSAIWmR_k5dOJr2u-1I3swDkzWQw56Z0EypzAhg6c";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* AUTH */
+async function signup(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await client.auth.signUp({ email, password });
+
+  if(error) alert(error.message);
+  else alert("Signup success → now login");
+}
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert(error.message);
+  } else {
+    showApp();
+    loadCases();
+  }
+}
+
+async function logout(){
+  await client.auth.signOut();
+  location.reload();
+}
+
+/* UI */
+function showApp(){
+  document.getElementById("authBox").style.display="none";
+  document.getElementById("app").style.display="block";
+}
+
+/* INSERT CASE (SECURE) */
+async function insertCase(){
+
+  const { data: userData } = await client.auth.getUser();
+
+  const name = document.getElementById("name").value;
+  const caseType = document.getElementById("caseType").value;
+  const status = document.getElementById("status").value;
+
+  if(!name || !caseType || !status){
+  alert("Please fill all fields");
+  return;
+}
+
+  const { error } = await client
+    .from("clients")
+    .insert([
+      {
+        name,
+        case_type: caseType,
+        status,
+        user_id: userData.user.id   // 🔥 SECURITY KEY
+      }
+    ]);
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert("Case added");
+    loadCases();
+  }
+}
+
+async function addHearing(){
+
+  const { data: userData } = await client.auth.getUser();
+
+  const case_id = document.getElementById("hearingCaseId").value;
+  const hearing_date = document.getElementById("hearingDate").value;
+  const court_name = document.getElementById("courtName").value;
+  const status = document.getElementById("hearingStatus").value;
+  const notes = document.getElementById("hearingNotes").value;
+
+  if(!case_id || !hearing_date || !court_name || !status){
+  alert("Please fill required fields");
+  return;
+}
+
+  const { error } = await client
+    .from("hearings")
+    .insert([{
+      case_id,
+      hearing_date,
+      court_name,
+      status,
+      notes,
+      user_id: userData.user.id
+    }]);
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert("Hearing added");
+    loadHearings();
+  }
+}
+// Upload Document
+async function uploadDocument(){
+
+  const { data: userData } = await client.auth.getUser();
+
+  const case_id = document.getElementById("docCaseId").value;
+  const file = document.getElementById("fileUpload").files[0];
+
+  if(!case_id || !file){
+    alert("Please select case and file");
+    return;
+  }
+
+  const fileName = `${Date.now()}_${file.name}`;
+
+  // 1. Upload file to storage
+  const { data, error } = await client.storage
+    .from("case-documents")
+    .upload(fileName, file);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  // 2. Get URL
+  const { data: urlData } = client.storage
+    .from("case-documents")
+    .getPublicUrl(fileName);
+
+  // 3. Save in DB
+  const { error: dbError } = await client
+    .from("documents")
+    .insert([{
+      case_id,
+      file_name: file.name,
+      file_url: urlData.publicUrl,
+      user_id: userData.user.id
+    }]);
+
+  if(dbError){
+    alert(dbError.message);
+    return;
+  }
+
+  alert("Document uploaded");
+  loadDocuments();
+}
+
+/* LOAD ONLY OWN CASES */
+async function loadCases(){
+
+  const { data: userData } = await client.auth.getUser();
+
+const { data, error } = await client
+  .from("clients")
+  .select("*")
+  .eq("user_id", userData.user.id)
+  .order("id", { ascending: false });
+
+  if(error){
+  console.log(error);
+  return;
+}
+
+  const box = document.getElementById("cases");
+  box.innerHTML = "";
+
+  data.forEach(c => {
+    box.innerHTML += `
+      <div class="card">
+        <b>${c.name}</b><br>
+        ${c.case_type} - ${c.status}
+      </div>
+    `;
+  });
+}
+
+async function loadHearings(){
+
+  const { data: userData } = await client.auth.getUser();
+
+const { data, error } = await client
+  .from("hearings")
+  .select("*")
+  .eq("user_id", userData.user.id)
+  .order("hearing_date", { ascending: true });
+
+  if(error){
+  console.log(error);
+  return;
+}
+
+  const box = document.getElementById("hearings");
+  box.innerHTML = "";
+
+  data.forEach(h => {
+    box.innerHTML += `
+      <div class="card">
+        <b>Case ID:</b> ${h.case_id}<br>
+        <b>Date:</b> ${h.hearing_date}<br>
+        <b>Court:</b> ${h.court_name}<br>
+        <b>Status:</b> ${h.status}<br>
+        <b>Notes:</b> ${h.notes}
+      </div>
+    `;
+  });
+}
+
+//Document
+async function loadDocuments(){
+
+  const { data: userData } = await client.auth.getUser();
+
+  const { data, error } = await client
+    .from("documents")
+    .select("*")
+    .eq("user_id", userData.user.id)
+    .order("uploaded_at", { ascending: false });
+
+  if(error){
+    console.log(error);
+    return;
+  }
+
+  const box = document.getElementById("documents");
+  box.innerHTML = "";
+
+  data.forEach(doc => {
+    box.innerHTML += `
+      <div class="card">
+        <b>Case ID:</b> ${doc.case_id}<br>
+        <b>File:</b> ${doc.file_name}<br>
+        <a href="${doc.file_url}" target="_blank">View Document</a>
+      </div>
+    `;
+  });
+}
+
+//Chart
+let caseChartInstance = null;
+
+async function loadChart(){
+
+  const { data: userData } = await client.auth.getUser();
+
+  const { data, error } = await client
+    .from("clients")
+    .select("status")
+    .eq("user_id", userData.user.id);
+
+  if(error){
+    console.log(error);
+    return;
+  }
+
+  let active = 0;
+  let pending = 0;
+  let closed = 0;
+
+  data.forEach(c => {
+    const status = (c.status || "").toLowerCase();
+
+    if(status === "active") active++;
+    else if(status === "pending") pending++;
+    else if(status === "closed") closed++;
+  });
+
+  const ctx = document.getElementById("caseChart");
+
+  // ✅ IMPORTANT: destroy old chart before creating new one
+  if(caseChartInstance){
+    caseChartInstance.destroy();
+  }
+
+  caseChartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Active", "Pending", "Closed"],
+      datasets: [{
+        data: [active, pending, closed],
+        backgroundColor: ["#28a745", "#ffc107", "#dc3545"]
+      }]
+    }
+  });
+}
+
+/* AUTO LOGIN CHECK */
+client.auth.getSession().then(({ data }) => {
+  if(data.session){
+    showApp();
+    loadCases();
+    loadHearings();
+    loadDocuments();
+    loadChart();
+  }
+});
+
+</script>
+
+</body>
+</html>
