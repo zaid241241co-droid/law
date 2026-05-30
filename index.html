@@ -262,10 +262,9 @@ async function signup(){
     .from("access_codes")
     .select("*")
     .eq("code", accessCode)
-    .eq("used", false)
-    .single();
+    .eq("used", false);
 
- if(codeError || !codeData){
+if (codeError || !codeData || codeData.length === 0) {
   console.log(codeError);
   alert("Invalid or already used access code");
   return;
@@ -289,7 +288,7 @@ async function signup(){
       used: true,
       used_by: signUpData.user?.id
     })
-    .eq("id", codeData.id);
+    .eq("id", codeData[0].id);
 
   alert("Signup successful. Verify email and then login.");
 }
