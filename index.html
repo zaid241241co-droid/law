@@ -33,13 +33,11 @@ body{
   transition:0.3s ease;
 }
 
-/* Hover effect */
 .box:hover{
   transform:scale(1.03);
   box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* Inputs */
 input{
   width:100%;
   padding:12px;
@@ -49,7 +47,6 @@ input{
   outline:none;
 }
 
-/* Button hover golden effect */
 button{
   width:100%;
   padding:12px;
@@ -59,19 +56,13 @@ button{
   cursor:pointer;
   border-radius:6px;
   transition:0.3s ease;
-   margin-top:8px;
+  margin-top:8px;
 }
 
 button:hover{
   background:gold;
   color:black;
   transform:scale(1.02);
-}
-
-input{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
 }
 
 #app{
@@ -96,22 +87,11 @@ input{
   box-sizing:border-box;
 }
 
-img,
-canvas{
-  max-width:100%;
-  height:auto;
-}
-
 #app{
   width:100%;
   max-width:1200px;
   margin:auto;
   padding:20px;
-}
-
-.card{
-  width:100%;
-  overflow-wrap:break-word;
 }
 
 input,
@@ -127,54 +107,6 @@ button{
   display:block;
 }
 
-@media (max-width:768px){
-
-  #app{
-    padding:15px;
-  }
-
-  h2{
-    font-size:24px;
-  }
-
-  h3{
-    font-size:20px;
-  }
-
-  .box{
-    width:95%;
-    padding:20px;
-  }
-
-  input,
-  button{
-    font-size:16px;
-    padding:12px;
-  }
-
-  #caseChart{
-    max-width:260px;
-  }
-}
-
-@media (max-width:480px){
-
-  #app{
-    padding:10px;
-  }
-
-  h2{
-    font-size:22px;
-  }
-
-  h3{
-    font-size:18px;
-  }
-
-  #caseChart{
-    max-width:220px;
-  }
-}
 </style>
 </head>
 
@@ -187,7 +119,6 @@ button{
 
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
-    <input id="accessCode" placeholder="Access Code">
 
     <button onclick="signup()">Signup</button>
     <button onclick="login()">Login</button>
@@ -213,30 +144,7 @@ button{
   <div id="cases"></div>
 
   <h3>Case Overview</h3>
-<canvas id="caseChart" width="300" height="300"></canvas>
-
-  <h3>Add Hearing</h3>
-
-<input id="hearingCaseId" placeholder="Case ID">
-<input id="hearingDate" type="date">
-<input id="courtName" placeholder="Court Name">
-<input id="hearingStatus" placeholder="Status">
-<input id="hearingNotes" placeholder="Notes">
-
-<button onclick="addHearing()">Add Hearing</button>
-
-<h3>Hearings</h3>
-<div id="hearings"></div>
-
-<h3>Upload Document</h3>
-
-<input id="docCaseId" placeholder="Case ID">
-<input id="fileUpload" type="file">
-
-<button onclick="uploadDocument()">Upload</button>
-
-<h3>Documents</h3>
-<div id="documents"></div>
+  <canvas id="caseChart" width="300" height="300"></canvas>
 
 </div>
 
@@ -250,50 +158,44 @@ const SUPABASE_KEY =
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* AUTH */
+/* =========================
+   ALLOWLIST SIGNUP SYSTEM
+========================= */
+
 async function signup(){
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const accessCode = document.getElementById("accessCode").value.trim();
 
-  // Check access code
-  const { data: codeData, error: codeError } = await client
-    .from("access_codes")
+  // 🔐 ALLOWLIST CHECK
+  const { data: allowedUser, error } = await client
+    .from("allowed_users")
     .select("*")
-    .eq("code", accessCode)
-    .eq("used", false);
+    .eq("email", email)
+    .single();
 
-if (codeError || !codeData || codeData.length === 0) {
-  console.log(codeError);
-  alert("Invalid or already used access code");
-  return;
-}
+  if(error || !allowedUser){
+    alert("You are not allowed to sign up");
+    return;
+  }
 
-  // Signup
-  const { data: signUpData, error } = await client.auth.signUp({
+  // SIGNUP
+  const { error: signErr } = await client.auth.signUp({
     email,
     password
   });
 
-  if(error){
-    alert(error.message);
+  if(signErr){
+    alert(signErr.message);
     return;
   }
 
-  // Mark code as used
-  await client
-    .from("access_codes")
-    .update({
-      used: true,
-      used_by: signUpData.user?.id
-    })
-    .eq("id", codeData[0].id);
-
-  alert("Signup successful. Verify email and then login.");
+  alert("Signup successful. Check email and login.");
 }
 
+/* LOGIN */
 async function login(){
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
@@ -304,12 +206,14 @@ async function login(){
 
   if(error){
     alert(error.message);
-  } else {
-    showApp();
-    loadCases();
+    return;
   }
+
+  showApp();
+  loadCases();
 }
 
+/* LOGOUT */
 async function logout(){
   await client.auth.signOut();
   location.reload();
@@ -321,141 +225,35 @@ function showApp(){
   document.getElementById("app").style.display="block";
 }
 
-/* INSERT CASE (SECURE) */
+/* CASE INSERT */
 async function insertCase(){
 
   const { data: userData } = await client.auth.getUser();
 
-  const name = document.getElementById("name").value;
-  const caseType = document.getElementById("caseType").value;
-  const status = document.getElementById("status").value;
+  await client.from("clients").insert([{
+    name: document.getElementById("name").value,
+    case_type: document.getElementById("caseType").value,
+    status: document.getElementById("status").value,
+    user_id: userData.user.id
+  }]);
 
-  if(!name || !caseType || !status){
-  alert("Please fill all fields");
-  return;
+  loadCases();
 }
 
-  const { error } = await client
-    .from("clients")
-    .insert([
-      {
-        name,
-        case_type: caseType,
-        status,
-        user_id: userData.user.id   // 🔥 SECURITY KEY
-      }
-    ]);
-
-  if(error){
-    alert(error.message);
-  } else {
-    alert("Case added");
-    loadCases();
-  }
-}
-
-async function addHearing(){
-
-  const { data: userData } = await client.auth.getUser();
-
-  const case_id = document.getElementById("hearingCaseId").value;
-  const hearing_date = document.getElementById("hearingDate").value;
-  const court_name = document.getElementById("courtName").value;
-  const status = document.getElementById("hearingStatus").value;
-  const notes = document.getElementById("hearingNotes").value;
-
-  if(!case_id || !hearing_date || !court_name || !status){
-  alert("Please fill required fields");
-  return;
-}
-
-  const { error } = await client
-    .from("hearings")
-    .insert([{
-      case_id,
-      hearing_date,
-      court_name,
-      status,
-      notes,
-      user_id: userData.user.id
-    }]);
-
-  if(error){
-    alert(error.message);
-  } else {
-    alert("Hearing added");
-    loadHearings();
-  }
-}
-// Upload Document
-async function uploadDocument(){
-
-  const { data: userData } = await client.auth.getUser();
-
-  const case_id = document.getElementById("docCaseId").value;
-  const file = document.getElementById("fileUpload").files[0];
-
-  if(!case_id || !file){
-    alert("Please select case and file");
-    return;
-  }
-
-  const fileName = `${Date.now()}_${file.name}`;
-
-  // 1. Upload file to storage
-  const { data, error } = await client.storage
-    .from("case-documents")
-    .upload(fileName, file);
-
-  if(error){
-    alert(error.message);
-    return;
-  }
-
-  // 2. Get URL
-  const { data: urlData } = client.storage
-    .from("case-documents")
-    .getPublicUrl(fileName);
-
-  // 3. Save in DB
-  const { error: dbError } = await client
-    .from("documents")
-    .insert([{
-      case_id,
-      file_name: file.name,
-      file_url: urlData.publicUrl,
-      user_id: userData.user.id
-    }]);
-
-  if(dbError){
-    alert(dbError.message);
-    return;
-  }
-
-  alert("Document uploaded");
-  loadDocuments();
-}
-
-/* LOAD ONLY OWN CASES */
+/* LOAD CASES */
 async function loadCases(){
 
   const { data: userData } = await client.auth.getUser();
 
-const { data, error } = await client
-  .from("clients")
-  .select("*")
-  .eq("user_id", userData.user.id)
-  .order("id", { ascending: false });
-
-  if(error){
-  console.log(error);
-  return;
-}
+  const { data } = await client
+    .from("clients")
+    .select("*")
+    .eq("user_id", userData.user.id);
 
   const box = document.getElementById("cases");
   box.innerHTML = "";
 
-  data.forEach(c => {
+  data.forEach(c=>{
     box.innerHTML += `
       <div class="card">
         <b>${c.name}</b><br>
@@ -465,122 +263,43 @@ const { data, error } = await client
   });
 }
 
-async function loadHearings(){
-
-  const { data: userData } = await client.auth.getUser();
-
-const { data, error } = await client
-  .from("hearings")
-  .select("*")
-  .eq("user_id", userData.user.id)
-  .order("hearing_date", { ascending: true });
-
-  if(error){
-  console.log(error);
-  return;
-}
-
-  const box = document.getElementById("hearings");
-  box.innerHTML = "";
-
-  data.forEach(h => {
-    box.innerHTML += `
-      <div class="card">
-        <b>Case ID:</b> ${h.case_id}<br>
-        <b>Date:</b> ${h.hearing_date}<br>
-        <b>Court:</b> ${h.court_name}<br>
-        <b>Status:</b> ${h.status}<br>
-        <b>Notes:</b> ${h.notes}
-      </div>
-    `;
-  });
-}
-
-//Document
-async function loadDocuments(){
-
-  const { data: userData } = await client.auth.getUser();
-
-  const { data, error } = await client
-    .from("documents")
-    .select("*")
-    .eq("user_id", userData.user.id)
-    .order("uploaded_at", { ascending: false });
-
-  if(error){
-    console.log(error);
-    return;
-  }
-
-  const box = document.getElementById("documents");
-  box.innerHTML = "";
-
-  data.forEach(doc => {
-    box.innerHTML += `
-      <div class="card">
-        <b>Case ID:</b> ${doc.case_id}<br>
-        <b>File:</b> ${doc.file_name}<br>
-        <a href="${doc.file_url}" target="_blank">View Document</a>
-      </div>
-    `;
-  });
-}
-
-//Chart
-let caseChartInstance = null;
+/* CHART */
+let chartInstance = null;
 
 async function loadChart(){
 
   const { data: userData } = await client.auth.getUser();
 
-  const { data, error } = await client
+  const { data } = await client
     .from("clients")
     .select("status")
     .eq("user_id", userData.user.id);
 
-  if(error){
-    console.log(error);
-    return;
-  }
+  let active=0,pending=0,closed=0;
 
-  let active = 0;
-  let pending = 0;
-  let closed = 0;
-
-  data.forEach(c => {
-    const status = (c.status || "").toLowerCase();
-
-    if(status === "active") active++;
-    else if(status === "pending") pending++;
-    else if(status === "closed") closed++;
+  data.forEach(c=>{
+    const s = (c.status||"").toLowerCase();
+    if(s==="active") active++;
+    else if(s==="pending") pending++;
+    else closed++;
   });
 
-  const ctx = document.getElementById("caseChart");
+  if(chartInstance) chartInstance.destroy();
 
-  // ✅ IMPORTANT: destroy old chart before creating new one
-  if(caseChartInstance){
-    caseChartInstance.destroy();
-  }
-
-  caseChartInstance = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Active", "Pending", "Closed"],
-      datasets: [{
-        data: [active, pending, closed],
-        backgroundColor: ["#28a745", "#ffc107", "#dc3545"]
-      }]
+  chartInstance = new Chart(document.getElementById("caseChart"),{
+    type:"doughnut",
+    data:{
+      labels:["Active","Pending","Closed"],
+      datasets:[{data:[active,pending,closed]}]
     }
   });
 }
 
-/* AUTO LOGIN CHECK */
-client.auth.getSession().then(({ data }) => {
+/* AUTO LOGIN */
+client.auth.getSession().then(({data})=>{
   if(data.session){
     showApp();
     loadCases();
-    loadHearings();
-    loadDocuments();
     loadChart();
   }
 });
