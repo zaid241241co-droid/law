@@ -91,6 +91,90 @@ input{
   background:red;
   margin-top:10px;
 }
+
+*{
+  box-sizing:border-box;
+}
+
+img,
+canvas{
+  max-width:100%;
+  height:auto;
+}
+
+#app{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  width:100%;
+  overflow-wrap:break-word;
+}
+
+input,
+button{
+  width:100%;
+  min-height:48px;
+  font-size:16px;
+}
+
+#caseChart{
+  max-width:350px;
+  margin:20px auto;
+  display:block;
+}
+
+@media (max-width:768px){
+
+  #app{
+    padding:15px;
+  }
+
+  h2{
+    font-size:24px;
+  }
+
+  h3{
+    font-size:20px;
+  }
+
+  .box{
+    width:95%;
+    padding:20px;
+  }
+
+  input,
+  button{
+    font-size:16px;
+    padding:12px;
+  }
+
+  #caseChart{
+    max-width:260px;
+  }
+}
+
+@media (max-width:480px){
+
+  #app{
+    padding:10px;
+  }
+
+  h2{
+    font-size:22px;
+  }
+
+  h3{
+    font-size:18px;
+  }
+
+  #caseChart{
+    max-width:220px;
+  }
+}
 </style>
 </head>
 
