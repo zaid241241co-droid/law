@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Advocate Dashboard</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -45,20 +47,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
 }
 .auth-left h1 span{color:var(--gold)}
 .auth-left p{font-size:16px;opacity:0.7;max-width:360px;line-height:1.7}
-.auth-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:rgba(201,168,76,0.15);
-  border:1px solid rgba(201,168,76,0.3);
-  color:var(--gold-light);
-  padding:6px 14px;
-  border-radius:100px;
-  font-size:12px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  margin-bottom:24px;
-}
+
 .auth-right{
   width:460px;
   background:white;
@@ -67,47 +56,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
   justify-content:center;
   padding:60px 48px;
 }
-.auth-right h2{
-  font-family:'Cormorant Garamond',serif;
-  font-size:32px;
-  font-weight:600;
-  margin-bottom:8px;
-}
-.auth-right p.sub{font-size:14px;color:var(--muted);margin-bottom:32px}
 
 .field{margin-bottom:16px}
-.field label{display:block;font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .field input{
   width:100%;
   padding:12px 16px;
   border:1.5px solid var(--border);
   border-radius:8px;
-  font-family:'DM Sans',sans-serif;
   font-size:15px;
   outline:none;
-  transition:border-color 0.2s;
 }
-.field input:focus{border-color:var(--navy)}
 
 .btn{
   width:100%;
   padding:13px;
   border:none;
   border-radius:8px;
-  font-family:'DM Sans',sans-serif;
-  font-size:15px;
-  font-weight:500;
   cursor:pointer;
-  transition:all 0.2s;
 }
 .btn-primary{background:var(--navy);color:white}
-.btn-primary:hover{background:#0d2a5a;transform:translateY(-1px)}
-.btn-secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);margin-top:10px}
-.btn-secondary:hover{background:var(--navy);color:white}
 .btn-danger{background:var(--danger);color:white;width:auto;padding:8px 16px;font-size:13px}
-.btn-danger:hover{background:#b91c1c}
-.btn-gold{background:var(--gold);color:var(--navy);font-weight:500}
-.btn-gold:hover{background:var(--gold-light)}
+.btn-gold{background:var(--gold);color:var(--navy)}
 
 .msg{
   padding:10px 14px;
@@ -116,28 +85,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
   margin-top:12px;
   display:none;
 }
-.msg.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
-.msg.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-.msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
 .msg.show{display:block}
-
-.auth-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border)}
-.auth-tab{
-  flex:1;
-  padding:10px;
-  text-align:center;
-  font-size:14px;
-  font-weight:500;
-  cursor:pointer;
-  color:var(--muted);
-  border-bottom:2px solid transparent;
-  margin-bottom:-2px;
-  transition:all 0.2s;
-}
-.auth-tab.active{color:var(--navy);border-color:var(--navy)}
+.msg.error{background:#fef2f2;color:#991b1b}
+.msg.success{background:#f0fdf4;color:#166534}
+.msg.info{background:#eff6ff;color:#1e40af}
 
 /* APP */
 #app{display:none;min-height:100vh}
+
 .topbar{
   background:var(--navy);
   padding:0 32px;
@@ -145,449 +100,253 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
   display:flex;
   align-items:center;
   justify-content:space-between;
-}
-.topbar-logo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;
   color:white;
-  font-weight:600;
-}
-.topbar-logo span{color:var(--gold)}
-.topbar-right{display:flex;align-items:center;gap:16px}
-.user-chip{
-  background:rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.8);
-  padding:4px 12px;
-  border-radius:100px;
-  font-size:13px;
 }
 
 .main-content{
   max-width:1100px;
-  margin:0 auto;
+  margin:auto;
   padding:32px 24px;
   display:grid;
   grid-template-columns:1fr 320px;
   gap:24px;
 }
-.section-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;
-  font-weight:600;
-  margin-bottom:16px;
-}
 
 .card{
-  background:var(--surface);
+  background:white;
   border-radius:12px;
   padding:24px;
   border:1px solid var(--border);
 }
 
-/* Add case form */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.form-grid .field{margin:0}
-.form-grid .field.full{grid-column:1/-1}
-select{
-  width:100%;
-  padding:12px 16px;
-  border:1.5px solid var(--border);
-  border-radius:8px;
-  font-family:'DM Sans',sans-serif;
-  font-size:15px;
-  outline:none;
-  background:white;
-  cursor:pointer;
-  transition:border-color 0.2s;
-}
-select:focus{border-color:var(--navy)}
+.cases-list{display:flex;flex-direction:column;gap:10px}
 
-/* Cases list */
-.cases-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .case-card{
-  background:var(--surface);
+  padding:14px;
   border:1px solid var(--border);
   border-radius:10px;
-  padding:16px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  transition:all 0.15s;
 }
-.case-card:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(7,26,61,0.08)}
-.case-name{font-weight:500;font-size:15px;margin-bottom:2px}
-.case-meta{font-size:13px;color:var(--muted)}
+
 .case-badge{
   padding:4px 10px;
   border-radius:100px;
   font-size:12px;
-  font-weight:500;
-  white-space:nowrap;
 }
+
 .badge-active{background:#dcfce7;color:#166534}
 .badge-pending{background:#fef9c3;color:#854d0e}
 .badge-closed{background:#f1f5f9;color:#475569}
-.badge-other{background:#ede9fe;color:#5b21b6}
 
-.empty-state{
-  text-align:center;
-  padding:40px 20px;
-  color:var(--muted);
-  font-size:14px;
-}
-.empty-icon{font-size:32px;margin-bottom:8px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
-/* Chart + stats sidebar */
-.sidebar{display:flex;flex-direction:column;gap:20px}
-.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px}
 .stat-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
   padding:16px;
   text-align:center;
+  border:1px solid var(--border);
+  border-radius:10px;
 }
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600}
-.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-top:2px}
-.stat-active .stat-num{color:var(--success)}
-.stat-pending .stat-num{color:#d97706}
-.stat-closed .stat-num{color:var(--muted)}
 
-#caseChart{max-height:200px}
+.stat-num{font-size:28px;font-weight:600}
 
-/* Loading spinner */
-.spinner{
-  width:20px;height:20px;
-  border:2px solid rgba(255,255,255,0.3);
-  border-top-color:white;
-  border-radius:50%;
-  animation:spin 0.6s linear infinite;
-  display:inline-block;
-  vertical-align:middle;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading{opacity:0.6;pointer-events:none}
-
-@media(max-width:900px){
-  .auth-left{display:none}
-  .auth-right{width:100%;padding:40px 24px}
-  .main-content{grid-template-columns:1fr}
-}
-@media(max-width:600px){
-  .form-grid{grid-template-columns:1fr}
-}
 </style>
 </head>
+
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div class="auth-screen" id="authBox">
   <div class="auth-left">
-    <div class="auth-badge">⚖ Advocate Portal</div>
     <h1>Manage your<br>practice with <span>clarity.</span></h1>
-    <p>A secure, private dashboard to track your clients, hearings, and case documents — designed for advocates.</p>
   </div>
+
   <div class="auth-right">
-    <h2>Welcome back</h2>
-    <p class="sub">Sign in to your dashboard or create an account</p>
 
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchTab('login')">Login</div>
-      <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+    <h2>Login / Signup</h2>
+
+    <div class="field">
+      <input id="email" placeholder="Email">
     </div>
 
-    <div id="loginForm">
-      <div class="field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
-      <div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="••••••••"></div>
-      <button class="btn btn-primary" onclick="login()">Sign In</button>
-      <div class="msg" id="loginMsg"></div>
+    <div class="field">
+      <input id="password" type="password" placeholder="Password">
     </div>
 
-    <div id="signupForm" style="display:none">
-      <div class="field"><label>Email</label><input id="signupEmail" type="email" placeholder="you@example.com"></div>
-      <div class="field"><label>Password (min 6 chars)</label><input id="signupPassword" type="password" placeholder="••••••••"></div>
-      <button class="btn btn-primary" onclick="signup()">Create Account</button>
-      <div class="msg" id="signupMsg"></div>
-    </div>
+    <button class="btn btn-primary" onclick="signup()">Signup</button>
+    <button class="btn btn-primary" onclick="login()">Login</button>
+
+    <div class="msg" id="msg"></div>
+
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
+
   <div class="topbar">
-    <div class="topbar-logo">Lex<span>Desk</span></div>
-    <div class="topbar-right">
-      <span class="user-chip" id="userChip">—</span>
-      <button class="btn btn-danger" onclick="logout()">Logout</button>
-    </div>
+    <h3>LexDesk</h3>
+    <button class="btn btn-danger" onclick="logout()">Logout</button>
   </div>
 
   <div class="main-content">
-    <!-- LEFT: Add case + case list -->
-    <div>
-      <div class="card" style="margin-bottom:20px">
-        <div class="section-title">Add New Case</div>
-        <div class="form-grid">
-          <div class="field full">
-            <label>Client Name</label>
-            <input id="clientName" placeholder="e.g. Ramesh Kumar">
-          </div>
-          <div class="field">
-            <label>Case Type</label>
-            <select id="caseType">
-              <option value="">Select type…</option>
-              <option>Civil</option>
-              <option>Criminal</option>
-              <option>Family</option>
-              <option>Corporate</option>
-              <option>Property</option>
-              <option>Labour</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Status</label>
-            <select id="caseStatus">
-              <option value="Active">Active</option>
-              <option value="Pending">Pending</option>
-              <option value="Closed">Closed</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-gold" id="addBtn" onclick="insertCase()">+ Add Case</button>
-        <div class="msg" id="addMsg"></div>
-      </div>
 
-      <div class="section-title">Your Cases</div>
-      <div id="casesList"><div class="empty-state"><div class="empty-icon">⚖</div>Loading cases…</div></div>
+    <div class="card">
+      <h3>Add Case</h3>
+
+      <input id="name" placeholder="Client Name">
+      <input id="caseType" placeholder="Case Type">
+      <input id="status" placeholder="Status">
+
+      <button class="btn btn-gold" onclick="insertCase()">Add</button>
+
+      <h3>Your Cases</h3>
+      <div id="cases"></div>
     </div>
 
-    <!-- RIGHT: Sidebar -->
-    <div class="sidebar">
-      <div>
-        <div class="stat-row">
-          <div class="stat-box stat-active"><div class="stat-num" id="statActive">0</div><div class="stat-label">Active</div></div>
-          <div class="stat-box stat-pending"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending</div></div>
-          <div class="stat-box stat-closed"><div class="stat-num" id="statClosed">0</div><div class="stat-label">Closed</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:18px">Case Overview</div>
-        <canvas id="caseChart"></canvas>
-        <div id="chartEmpty" class="empty-state" style="display:none;padding:20px 0"><div class="empty-icon">📊</div>No cases yet</div>
-      </div>
+    <div class="card">
+      <h3>Overview</h3>
+      <canvas id="caseChart"></canvas>
     </div>
+
   </div>
 </div>
 
 <script>
+
 const SUPABASE_URL = "https://icubannrfuawithpnxil.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdWJhbm5yZnVhd2l0aHBueGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzAwNjAsImV4cCI6MjA5NTY0NjA2MH0.o7lSAIWmR_k5dOJr2u-1I3swDkzWQw56Z0EypzAhg6c";
+const SUPABASE_KEY = "YOUR_KEY_HERE";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let chartInstance = null;
-
-/* ─── TABS ─── */
-function switchTab(tab){
-  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
-  document.getElementById('signupForm').style.display = tab==='signup'?'block':'none';
-  document.querySelectorAll('.auth-tab').forEach((el,i)=>{
-    el.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1));
-  });
-}
-
-/* ─── SHOW MESSAGE ─── */
-function showMsg(id,text,type='error'){
-  const el=document.getElementById(id);
+/* MESSAGE */
+function showMsg(text,type='error'){
+  const el=document.getElementById('msg');
   el.textContent=text;
-  el.className='msg '+type+' show';
+  el.className='msg show '+type;
 }
 
-/* ─── SIGNUP ─── */
+/* ✅ SIGNUP (ALLOWLIST REMOVED COMPLETELY) */
 async function signup(){
-  const email=document.getElementById('signupEmail').value.trim();
-  const password=document.getElementById('signupPassword').value;
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
 
-  if(!email||!password){showMsg('signupMsg','Please fill in all fields.');return;}
-  if(password.length<6){showMsg('signupMsg','Password must be at least 6 characters.');return;}
-
-  /* Allowlist check */
-  const {data:allowed,error:alErr}=await sb
-    .from('allowed_users').select('email').eq('email',email).maybeSingle();
-
-  if(alErr){showMsg('signupMsg','Could not verify access. Try again.');return;}
-  if(!allowed){showMsg('signupMsg','This email is not on the access list. Contact the administrator.');return;}
-
-  /* Register */
-  const {error}=await sb.auth.signUp({email,password});
-  if(error){
-    /* Already registered = user should login instead */
-    if(error.message.includes('already registered')||error.message.includes('already been registered')){
-      showMsg('signupMsg','This email is already registered. Please login instead.','info');
-    } else {
-      showMsg('signupMsg',error.message);
-    }
+  if(!email||!password){
+    showMsg("Fill all fields");
     return;
   }
-  showMsg('signupMsg','✓ Account created! Check your email to confirm, then login.','success');
+
+  const {error}=await sb.auth.signUp({
+    email,
+    password
+  });
+
+  if(error){
+    showMsg(error.message);
+    return;
+  }
+
+  showMsg("Signup successful! Check email confirmation","success");
 }
 
-/* ─── LOGIN ─── */
+/* LOGIN */
 async function login(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const password=document.getElementById('loginPassword').value;
-  if(!email||!password){showMsg('loginMsg','Please fill in all fields.');return;}
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
 
-  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  const {data,error}=await sb.auth.signInWithPassword({
+    email,password
+  });
+
   if(error){
-    if(error.message.includes('Email not confirmed')){
-      showMsg('loginMsg','Please confirm your email first. Check your inbox.','info');
-    } else if(error.message.includes('Invalid login')){
-      showMsg('loginMsg','Incorrect email or password.');
-    } else {
-      showMsg('loginMsg',error.message);
-    }
+    showMsg(error.message);
     return;
   }
-  showApp(data.user);
+
+  document.getElementById('authBox').style.display='none';
+  document.getElementById('app').style.display='block';
+
   loadCases();
 }
 
-/* ─── LOGOUT ─── */
+/* LOGOUT */
 async function logout(){
   await sb.auth.signOut();
   location.reload();
 }
 
-/* ─── SHOW APP ─── */
-function showApp(user){
-  document.getElementById('authBox').style.display='none';
-  document.getElementById('app').style.display='block';
-  if(user) document.getElementById('userChip').textContent=user.email;
-}
-
-/* ─── INSERT CASE ─── */
+/* INSERT CASE */
 async function insertCase(){
-  const name=document.getElementById('clientName').value.trim();
+
+  const {data:user}=await sb.auth.getUser();
+
+  const name=document.getElementById('name').value;
   const caseType=document.getElementById('caseType').value;
-  const status=document.getElementById('caseStatus').value;
+  const status=document.getElementById('status').value;
 
-  if(!name){showMsg('addMsg','Client name is required.');return;}
-  if(!caseType){showMsg('addMsg','Please select a case type.');return;}
-
-  const btn=document.getElementById('addBtn');
-  btn.classList.add('loading');
-
-  const {data:userData}=await sb.auth.getUser();
-  const {error}=await sb.from('clients').insert([{
+  await sb.from('clients').insert([{
     name,
     case_type:caseType,
     status,
-    user_id:userData.user.id
+    user_id:user.user.id
   }]);
 
-  btn.classList.remove('loading');
-
-  if(error){
-    showMsg('addMsg','Error adding case: '+error.message);
-    return;
-  }
-
-  /* Clear form */
-  document.getElementById('clientName').value='';
-  document.getElementById('caseType').value='';
-  document.getElementById('caseStatus').value='Active';
-  document.getElementById('addMsg').className='msg';
-
-  loadCases(); /* reloads list AND chart */
+  loadCases();
 }
 
-/* ─── LOAD CASES ─── */
+/* LOAD CASES */
 async function loadCases(){
-  const {data:userData}=await sb.auth.getUser();
-  const {data,error}=await sb.from('clients').select('*').eq('user_id',userData.user.id).order('created_at',{ascending:false});
 
-  const cases=data||[];
-  renderCases(cases);
-  renderChart(cases);
-}
+  const {data:user}=await sb.auth.getUser();
 
-/* ─── RENDER CASES ─── */
-function renderCases(cases){
-  const box=document.getElementById('casesList');
-  if(!cases.length){
-    box.innerHTML='<div class="empty-state"><div class="empty-icon">⚖</div>No cases yet. Add your first case above.</div>';
-    return;
-  }
-  box.innerHTML='<div class="cases-list">'+cases.map(c=>{
-    const s=(c.status||'').toLowerCase();
-    const badge=s==='active'?'badge-active':s==='pending'?'badge-pending':s==='closed'?'badge-closed':'badge-other';
-    return `<div class="case-card">
-      <div>
-        <div class="case-name">${escHtml(c.name)}</div>
-        <div class="case-meta">${escHtml(c.case_type||'—')}</div>
-      </div>
-      <span class="case-badge ${badge}">${escHtml(c.status||'—')}</span>
-    </div>`;
-  }).join('')+'</div>';
-}
+  const {data}=await sb.from('clients')
+    .select('*')
+    .eq('user_id',user.user.id);
 
-/* ─── RENDER CHART ─── */
-function renderChart(cases){
+  const box=document.getElementById('cases');
+  box.innerHTML="";
+
   let active=0,pending=0,closed=0;
-  cases.forEach(c=>{
-    const s=(c.status||'').toLowerCase();
-    if(s==='active')active++;
-    else if(s==='pending')pending++;
+
+  data.forEach(c=>{
+
+    if(c.status==='Active') active++;
+    else if(c.status==='Pending') pending++;
     else closed++;
+
+    box.innerHTML+=`
+      <div class="case-card">
+        <b>${c.name}</b><br>
+        ${c.case_type} - ${c.status}
+      </div>
+    `;
   });
 
-  document.getElementById('statActive').textContent=active;
-  document.getElementById('statPending').textContent=pending;
-  document.getElementById('statClosed').textContent=closed;
+  renderChart(active,pending,closed);
+}
 
-  const canvas=document.getElementById('caseChart');
-  const emptyEl=document.getElementById('chartEmpty');
+/* CHART */
+function renderChart(a,p,c){
 
-  if(!cases.length){
-    canvas.style.display='none';
-    emptyEl.style.display='block';
-    return;
-  }
-  canvas.style.display='block';
-  emptyEl.style.display='none';
-
-  if(chartInstance)chartInstance.destroy();
-  chartInstance=new Chart(canvas,{
+  new Chart(document.getElementById('caseChart'),{
     type:'doughnut',
     data:{
       labels:['Active','Pending','Closed'],
       datasets:[{
-        data:[active,pending,closed],
-        backgroundColor:['#16a34a','#d97706','#94a3b8'],
-        borderWidth:0,
-        hoverOffset:6
+        data:[a,p,c],
+        backgroundColor:['#16a34a','#d97706','#94a3b8']
       }]
-    },
-    options:{
-      cutout:'68%',
-      plugins:{legend:{position:'bottom',labels:{font:{family:"'DM Sans',sans-serif",size:12},padding:16}}}
     }
   });
 }
 
-/* ─── HELPER ─── */
-function escHtml(str){
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-/* ─── AUTO LOGIN CHECK ─── */
+/* AUTO SESSION */
 sb.auth.getSession().then(({data})=>{
   if(data.session){
-    showApp(data.session.user);
+    document.getElementById('authBox').style.display='none';
+    document.getElementById('app').style.display='block';
     loadCases();
   }
 });
+
 </script>
+
 </body>
 </html>
