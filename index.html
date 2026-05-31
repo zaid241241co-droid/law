@@ -2,309 +2,592 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lawyer Dashboard</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+<title>Advocate Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body{
-  font-family:Poppins;
-  margin:0;
-  background:#f4f7fc;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#071a3d;
+  --gold:#c9a84c;
+  --gold-light:#f0d080;
+  --cream:#faf8f3;
+  --surface:#ffffff;
+  --text:#1a1a2e;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --danger:#dc2626;
+  --success:#16a34a;
 }
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
 
-.center{
-  height:100vh;
+/* AUTH */
+.auth-screen{
+  min-height:100vh;
   display:flex;
+  background:linear-gradient(135deg,var(--navy) 0%,#0f2d5e 50%,#16336b 100%);
+}
+.auth-left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
   justify-content:center;
-  align-items:center;
-}
-
-.box{
-  background:white;
-  padding:35px;
-  border-radius:14px;
-  width:360px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.1);
-  transition:0.3s ease;
-}
-
-.box:hover{
-  transform:scale(1.03);
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
-}
-
-input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border:1px solid #ddd;
-  border-radius:6px;
-  outline:none;
-}
-
-button{
-  width:100%;
-  padding:12px;
-  background:#071a3d;
+  padding:60px;
   color:white;
+}
+.auth-left h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,5vw,64px);
+  font-weight:600;
+  line-height:1.1;
+  margin-bottom:20px;
+}
+.auth-left h1 span{color:var(--gold)}
+.auth-left p{font-size:16px;opacity:0.7;max-width:360px;line-height:1.7}
+.auth-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.3);
+  color:var(--gold-light);
+  padding:6px 14px;
+  border-radius:100px;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+.auth-right{
+  width:460px;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:60px 48px;
+}
+.auth-right h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+.auth-right p.sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field input{
+  width:100%;
+  padding:12px 16px;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.field input:focus{border-color:var(--navy)}
+
+.btn{
+  width:100%;
+  padding:13px;
   border:none;
+  border-radius:8px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  font-weight:500;
   cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-primary{background:var(--navy);color:white}
+.btn-primary:hover{background:#0d2a5a;transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);margin-top:10px}
+.btn-secondary:hover{background:var(--navy);color:white}
+.btn-danger{background:var(--danger);color:white;width:auto;padding:8px 16px;font-size:13px}
+.btn-danger:hover{background:#b91c1c}
+.btn-gold{background:var(--gold);color:var(--navy);font-weight:500}
+.btn-gold:hover{background:var(--gold-light)}
+
+.msg{
+  padding:10px 14px;
   border-radius:6px;
-  transition:0.3s ease;
-  margin-top:8px;
-}
-
-button:hover{
-  background:gold;
-  color:black;
-  transform:scale(1.02);
-}
-
-#app{
+  font-size:13px;
+  margin-top:12px;
   display:none;
-  padding:20px;
+}
+.msg.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.msg.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.msg.show{display:block}
+
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border)}
+.auth-tab{
+  flex:1;
+  padding:10px;
+  text-align:center;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  color:var(--muted);
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+  transition:all 0.2s;
+}
+.auth-tab.active{color:var(--navy);border-color:var(--navy)}
+
+/* APP */
+#app{display:none;min-height:100vh}
+.topbar{
+  background:var(--navy);
+  padding:0 32px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.topbar-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  color:white;
+  font-weight:600;
+}
+.topbar-logo span{color:var(--gold)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.user-chip{
+  background:rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.8);
+  padding:4px 12px;
+  border-radius:100px;
+  font-size:13px;
+}
+
+.main-content{
+  max-width:1100px;
+  margin:0 auto;
+  padding:32px 24px;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:24px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:16px;
 }
 
 .card{
+  background:var(--surface);
+  border-radius:12px;
+  padding:24px;
+  border:1px solid var(--border);
+}
+
+/* Add case form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-grid .field{margin:0}
+.form-grid .field.full{grid-column:1/-1}
+select{
+  width:100%;
+  padding:12px 16px;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  outline:none;
   background:white;
-  padding:12px;
-  margin-top:10px;
+  cursor:pointer;
+  transition:border-color 0.2s;
+}
+select:focus{border-color:var(--navy)}
+
+/* Cases list */
+.cases-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.case-card{
+  background:var(--surface);
+  border:1px solid var(--border);
   border-radius:10px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:all 0.15s;
 }
-
-.logout{
-  background:red;
-  margin-top:10px;
+.case-card:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(7,26,61,0.08)}
+.case-name{font-weight:500;font-size:15px;margin-bottom:2px}
+.case-meta{font-size:13px;color:var(--muted)}
+.case-badge{
+  padding:4px 10px;
+  border-radius:100px;
+  font-size:12px;
+  font-weight:500;
+  white-space:nowrap;
 }
+.badge-active{background:#dcfce7;color:#166534}
+.badge-pending{background:#fef9c3;color:#854d0e}
+.badge-closed{background:#f1f5f9;color:#475569}
+.badge-other{background:#ede9fe;color:#5b21b6}
 
-*{
-  box-sizing:border-box;
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--muted);
+  font-size:14px;
 }
+.empty-icon{font-size:32px;margin-bottom:8px}
 
-#app{
-  width:100%;
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
+/* Chart + stats sidebar */
+.sidebar{display:flex;flex-direction:column;gap:20px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px}
+.stat-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  text-align:center;
 }
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-top:2px}
+.stat-active .stat-num{color:var(--success)}
+.stat-pending .stat-num{color:#d97706}
+.stat-closed .stat-num{color:var(--muted)}
 
-input,
-button{
-  width:100%;
-  min-height:48px;
-  font-size:16px;
+#caseChart{max-height:200px}
+
+/* Loading spinner */
+.spinner{
+  width:20px;height:20px;
+  border:2px solid rgba(255,255,255,0.3);
+  border-top-color:white;
+  border-radius:50%;
+  animation:spin 0.6s linear infinite;
+  display:inline-block;
+  vertical-align:middle;
 }
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{opacity:0.6;pointer-events:none}
 
-#caseChart{
-  max-width:350px;
-  margin:20px auto;
-  display:block;
+@media(max-width:900px){
+  .auth-left{display:none}
+  .auth-right{width:100%;padding:40px 24px}
+  .main-content{grid-template-columns:1fr}
 }
-
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
-
 <body>
 
-<!-- AUTH -->
-<div class="center" id="authBox">
-  <div class="box">
-    <h3>Lawyer Login</h3>
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="authBox">
+  <div class="auth-left">
+    <div class="auth-badge">⚖ Advocate Portal</div>
+    <h1>Manage your<br>practice with <span>clarity.</span></h1>
+    <p>A secure, private dashboard to track your clients, hearings, and case documents — designed for advocates.</p>
+  </div>
+  <div class="auth-right">
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to your dashboard or create an account</p>
 
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+      <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
 
-    <button onclick="signup()">Signup</button>
-    <button onclick="login()">Login</button>
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="loginPassword" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="login()">Sign In</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div id="signupForm" style="display:none">
+      <div class="field"><label>Email</label><input id="signupEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password (min 6 chars)</label><input id="signupPassword" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="signup()">Create Account</button>
+      <div class="msg" id="signupMsg"></div>
+    </div>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">Lex<span>Desk</span></div>
+    <div class="topbar-right">
+      <span class="user-chip" id="userChip">—</span>
+      <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
 
-  <h2>Advocate Dashboard</h2>
+  <div class="main-content">
+    <!-- LEFT: Add case + case list -->
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-title">Add New Case</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Client Name</label>
+            <input id="clientName" placeholder="e.g. Ramesh Kumar">
+          </div>
+          <div class="field">
+            <label>Case Type</label>
+            <select id="caseType">
+              <option value="">Select type…</option>
+              <option>Civil</option>
+              <option>Criminal</option>
+              <option>Family</option>
+              <option>Corporate</option>
+              <option>Property</option>
+              <option>Labour</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="caseStatus">
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-gold" id="addBtn" onclick="insertCase()">+ Add Case</button>
+        <div class="msg" id="addMsg"></div>
+      </div>
 
-  <button class="logout" onclick="logout()">Logout</button>
+      <div class="section-title">Your Cases</div>
+      <div id="casesList"><div class="empty-state"><div class="empty-icon">⚖</div>Loading cases…</div></div>
+    </div>
 
-  <h3>Add Case</h3>
-
-  <input id="name" placeholder="Client Name">
-  <input id="caseType" placeholder="Case Type">
-  <input id="status" placeholder="Status">
-
-  <button onclick="insertCase()">Add Case</button>
-
-  <h3>Your Cases</h3>
-  <div id="cases"></div>
-
-  <h3>Case Overview</h3>
-  <canvas id="caseChart" width="300" height="300"></canvas>
-
+    <!-- RIGHT: Sidebar -->
+    <div class="sidebar">
+      <div>
+        <div class="stat-row">
+          <div class="stat-box stat-active"><div class="stat-num" id="statActive">0</div><div class="stat-label">Active</div></div>
+          <div class="stat-box stat-pending"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending</div></div>
+          <div class="stat-box stat-closed"><div class="stat-num" id="statClosed">0</div><div class="stat-label">Closed</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="font-size:18px">Case Overview</div>
+        <canvas id="caseChart"></canvas>
+        <div id="chartEmpty" class="empty-state" style="display:none;padding:20px 0"><div class="empty-icon">📊</div>No cases yet</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-
-/* SUPABASE */
 const SUPABASE_URL = "https://icubannrfuawithpnxil.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdWJhbm5yZnVhd2l0aHBueGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzAwNjAsImV4cCI6MjA5NTY0NjA2MH0.o7lSAIWmR_k5dOJr2u-1I3swDkzWQw56Z0EypzAhg6c";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdWJhbm5yZnVhd2l0aHBueGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzAwNjAsImV4cCI6MjA5NTY0NjA2MH0.o7lSAIWmR_k5dOJr2u-1I3swDkzWQw56Z0EypzAhg6c";
+let chartInstance = null;
 
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* =========================
-   ALLOWLIST SIGNUP SYSTEM
-========================= */
-
-async function signup(){
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  // 🔐 ALLOWLIST CHECK
-  const { data: allowedUser, error } = await client
-    .from("allowed_users")
-    .select("*")
-    .eq("email", email)
-    .single();
-
-  if(error || !allowedUser){
-    alert("You are not allowed to sign up");
-    return;
-  }
-
-  // SIGNUP
-  const { error: signErr } = await client.auth.signUp({
-    email,
-    password
+/* ─── TABS ─── */
+function switchTab(tab){
+  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('signupForm').style.display = tab==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>{
+    el.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1));
   });
-
-  if(signErr){
-    alert(signErr.message);
-    return;
-  }
-
-  alert("Signup successful. Check email and login.");
 }
 
-/* LOGIN */
-async function login(){
+/* ─── SHOW MESSAGE ─── */
+function showMsg(id,text,type='error'){
+  const el=document.getElementById(id);
+  el.textContent=text;
+  el.className='msg '+type+' show';
+}
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+/* ─── SIGNUP ─── */
+async function signup(){
+  const email=document.getElementById('signupEmail').value.trim();
+  const password=document.getElementById('signupPassword').value;
 
-  const { data, error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
+  if(!email||!password){showMsg('signupMsg','Please fill in all fields.');return;}
+  if(password.length<6){showMsg('signupMsg','Password must be at least 6 characters.');return;}
 
+  /* Allowlist check */
+  const {data:allowed,error:alErr}=await sb
+    .from('allowed_users').select('email').eq('email',email).maybeSingle();
+
+  if(alErr){showMsg('signupMsg','Could not verify access. Try again.');return;}
+  if(!allowed){showMsg('signupMsg','This email is not on the access list. Contact the administrator.');return;}
+
+  /* Register */
+  const {error}=await sb.auth.signUp({email,password});
   if(error){
-    alert(error.message);
+    /* Already registered = user should login instead */
+    if(error.message.includes('already registered')||error.message.includes('already been registered')){
+      showMsg('signupMsg','This email is already registered. Please login instead.','info');
+    } else {
+      showMsg('signupMsg',error.message);
+    }
     return;
   }
+  showMsg('signupMsg','✓ Account created! Check your email to confirm, then login.','success');
+}
 
-  showApp();
+/* ─── LOGIN ─── */
+async function login(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  if(!email||!password){showMsg('loginMsg','Please fill in all fields.');return;}
+
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){
+    if(error.message.includes('Email not confirmed')){
+      showMsg('loginMsg','Please confirm your email first. Check your inbox.','info');
+    } else if(error.message.includes('Invalid login')){
+      showMsg('loginMsg','Incorrect email or password.');
+    } else {
+      showMsg('loginMsg',error.message);
+    }
+    return;
+  }
+  showApp(data.user);
   loadCases();
 }
 
-/* LOGOUT */
+/* ─── LOGOUT ─── */
 async function logout(){
-  await client.auth.signOut();
+  await sb.auth.signOut();
   location.reload();
 }
 
-/* UI */
-function showApp(){
-  document.getElementById("authBox").style.display="none";
-  document.getElementById("app").style.display="block";
+/* ─── SHOW APP ─── */
+function showApp(user){
+  document.getElementById('authBox').style.display='none';
+  document.getElementById('app').style.display='block';
+  if(user) document.getElementById('userChip').textContent=user.email;
 }
 
-/* CASE INSERT */
+/* ─── INSERT CASE ─── */
 async function insertCase(){
+  const name=document.getElementById('clientName').value.trim();
+  const caseType=document.getElementById('caseType').value;
+  const status=document.getElementById('caseStatus').value;
 
-  const { data: userData } = await client.auth.getUser();
+  if(!name){showMsg('addMsg','Client name is required.');return;}
+  if(!caseType){showMsg('addMsg','Please select a case type.');return;}
 
-  await client.from("clients").insert([{
-    name: document.getElementById("name").value,
-    case_type: document.getElementById("caseType").value,
-    status: document.getElementById("status").value,
-    user_id: userData.user.id
+  const btn=document.getElementById('addBtn');
+  btn.classList.add('loading');
+
+  const {data:userData}=await sb.auth.getUser();
+  const {error}=await sb.from('clients').insert([{
+    name,
+    case_type:caseType,
+    status,
+    user_id:userData.user.id
   }]);
 
-  loadCases();
+  btn.classList.remove('loading');
+
+  if(error){
+    showMsg('addMsg','Error adding case: '+error.message);
+    return;
+  }
+
+  /* Clear form */
+  document.getElementById('clientName').value='';
+  document.getElementById('caseType').value='';
+  document.getElementById('caseStatus').value='Active';
+  document.getElementById('addMsg').className='msg';
+
+  loadCases(); /* reloads list AND chart */
 }
 
-/* LOAD CASES */
+/* ─── LOAD CASES ─── */
 async function loadCases(){
+  const {data:userData}=await sb.auth.getUser();
+  const {data,error}=await sb.from('clients').select('*').eq('user_id',userData.user.id).order('created_at',{ascending:false});
 
-  const { data: userData } = await client.auth.getUser();
-
-  const { data } = await client
-    .from("clients")
-    .select("*")
-    .eq("user_id", userData.user.id);
-
-  const box = document.getElementById("cases");
-  box.innerHTML = "";
-
-  data.forEach(c=>{
-    box.innerHTML += `
-      <div class="card">
-        <b>${c.name}</b><br>
-        ${c.case_type} - ${c.status}
-      </div>
-    `;
-  });
+  const cases=data||[];
+  renderCases(cases);
+  renderChart(cases);
 }
 
-/* CHART */
-let chartInstance = null;
+/* ─── RENDER CASES ─── */
+function renderCases(cases){
+  const box=document.getElementById('casesList');
+  if(!cases.length){
+    box.innerHTML='<div class="empty-state"><div class="empty-icon">⚖</div>No cases yet. Add your first case above.</div>';
+    return;
+  }
+  box.innerHTML='<div class="cases-list">'+cases.map(c=>{
+    const s=(c.status||'').toLowerCase();
+    const badge=s==='active'?'badge-active':s==='pending'?'badge-pending':s==='closed'?'badge-closed':'badge-other';
+    return `<div class="case-card">
+      <div>
+        <div class="case-name">${escHtml(c.name)}</div>
+        <div class="case-meta">${escHtml(c.case_type||'—')}</div>
+      </div>
+      <span class="case-badge ${badge}">${escHtml(c.status||'—')}</span>
+    </div>`;
+  }).join('')+'</div>';
+}
 
-async function loadChart(){
-
-  const { data: userData } = await client.auth.getUser();
-
-  const { data } = await client
-    .from("clients")
-    .select("status")
-    .eq("user_id", userData.user.id);
-
+/* ─── RENDER CHART ─── */
+function renderChart(cases){
   let active=0,pending=0,closed=0;
-
-  data.forEach(c=>{
-    const s = (c.status||"").toLowerCase();
-    if(s==="active") active++;
-    else if(s==="pending") pending++;
+  cases.forEach(c=>{
+    const s=(c.status||'').toLowerCase();
+    if(s==='active')active++;
+    else if(s==='pending')pending++;
     else closed++;
   });
 
-  if(chartInstance) chartInstance.destroy();
+  document.getElementById('statActive').textContent=active;
+  document.getElementById('statPending').textContent=pending;
+  document.getElementById('statClosed').textContent=closed;
 
-  chartInstance = new Chart(document.getElementById("caseChart"),{
-    type:"doughnut",
+  const canvas=document.getElementById('caseChart');
+  const emptyEl=document.getElementById('chartEmpty');
+
+  if(!cases.length){
+    canvas.style.display='none';
+    emptyEl.style.display='block';
+    return;
+  }
+  canvas.style.display='block';
+  emptyEl.style.display='none';
+
+  if(chartInstance)chartInstance.destroy();
+  chartInstance=new Chart(canvas,{
+    type:'doughnut',
     data:{
-      labels:["Active","Pending","Closed"],
-      datasets:[{data:[active,pending,closed]}]
+      labels:['Active','Pending','Closed'],
+      datasets:[{
+        data:[active,pending,closed],
+        backgroundColor:['#16a34a','#d97706','#94a3b8'],
+        borderWidth:0,
+        hoverOffset:6
+      }]
+    },
+    options:{
+      cutout:'68%',
+      plugins:{legend:{position:'bottom',labels:{font:{family:"'DM Sans',sans-serif",size:12},padding:16}}}
     }
   });
 }
 
-/* AUTO LOGIN */
-client.auth.getSession().then(({data})=>{
+/* ─── HELPER ─── */
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── AUTO LOGIN CHECK ─── */
+sb.auth.getSession().then(({data})=>{
   if(data.session){
-    showApp();
+    showApp(data.session.user);
     loadCases();
-    loadChart();
   }
 });
-
 </script>
-
 </body>
 </html>
