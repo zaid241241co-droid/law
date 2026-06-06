@@ -1,353 +1,831 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advocate Dashboard</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#071a3d;
-  --gold:#c9a84c;
-  --gold-light:#f0d080;
-  --cream:#faf8f3;
-  --surface:#ffffff;
-  --text:#1a1a2e;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --danger:#dc2626;
-  --success:#16a34a;
-}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
-
-/* AUTH */
-.auth-screen{
-  min-height:100vh;
-  display:flex;
-  background:linear-gradient(135deg,var(--navy) 0%,#0f2d5e 50%,#16336b 100%);
-}
-.auth-left{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:60px;
-  color:white;
-}
-.auth-left h1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(36px,5vw,64px);
-  font-weight:600;
-  line-height:1.1;
-  margin-bottom:20px;
-}
-.auth-left h1 span{color:var(--gold)}
-.auth-left p{font-size:16px;opacity:0.7;max-width:360px;line-height:1.7}
-
-.auth-right{
-  width:460px;
-  background:white;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:60px 48px;
-}
-
-.field{margin-bottom:16px}
-.field input{
-  width:100%;
-  padding:12px 16px;
-  border:1.5px solid var(--border);
-  border-radius:8px;
-  font-size:15px;
-  outline:none;
-}
-
-.btn{
-  width:100%;
-  padding:13px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-.btn-primary{background:var(--navy);color:white}
-.btn-danger{background:var(--danger);color:white;width:auto;padding:8px 16px;font-size:13px}
-.btn-gold{background:var(--gold);color:var(--navy)}
-
-.msg{
-  padding:10px 14px;
-  border-radius:6px;
-  font-size:13px;
-  margin-top:12px;
-  display:none;
-}
-.msg.show{display:block}
-.msg.error{background:#fef2f2;color:#991b1b}
-.msg.success{background:#f0fdf4;color:#166534}
-.msg.info{background:#eff6ff;color:#1e40af}
-
-/* APP */
-#app{display:none;min-height:100vh}
-
-.topbar{
-  background:var(--navy);
-  padding:0 32px;
-  height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  color:white;
-}
-
-.main-content{
-  max-width:1100px;
-  margin:auto;
-  padding:32px 24px;
-  display:grid;
-  grid-template-columns:1fr 320px;
-  gap:24px;
-}
-
-.card{
-  background:white;
-  border-radius:12px;
-  padding:24px;
-  border:1px solid var(--border);
-}
-
-.cases-list{display:flex;flex-direction:column;gap:10px}
-
-.case-card{
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:10px;
-}
-
-.case-badge{
-  padding:4px 10px;
-  border-radius:100px;
-  font-size:12px;
-}
-
-.badge-active{background:#dcfce7;color:#166534}
-.badge-pending{background:#fef9c3;color:#854d0e}
-.badge-closed{background:#f1f5f9;color:#475569}
-
-.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-
-.stat-box{
-  padding:16px;
-  text-align:center;
-  border:1px solid var(--border);
-  border-radius:10px;
-}
-
-.stat-num{font-size:28px;font-weight:600}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexImperium | Professional Lawyer CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1329;
+            color: #f8fafc;
+        }
+        .font-serif-premium {
+            font-family: 'Cinzel', serif;
+        }
+        /* Custom Premium Color Definitions */
+        .bg-law-navy { background-color: #0a1128; }
+        .bg-law-slate { background-color: #1c2541; }
+        .bg-law-card { background-color: #131c35; }
+        .border-law-gold { border-color: #c5a880; }
+        .text-law-gold { color: #c5a880; }
+        .bg-law-gold { background-color: #c5a880; }
+        .hover-law-gold:hover { background-color: #b3946c; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a1128; }
+        ::-webkit-scrollbar-thumb { background: #1c2541; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c5a880; }
+    </style>
 </head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#c5a880] selection:text-black">
 
-<body>
-
-<!-- AUTH -->
-<div class="auth-screen" id="authBox">
-  <div class="auth-left">
-    <h1>Manage your<br>practice with <span>clarity.</span></h1>
-  </div>
-
-  <div class="auth-right">
-
-    <h2>Login / Signup</h2>
-
-    <div class="field">
-      <input id="email" placeholder="Email">
+    <div id="auth-page" class="fixed inset-0 z-50 flex items-center justify-center bg-law-navy px-4">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#c5a880_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="w-full max-w-md bg-law-card border border-slate-800 rounded-xl p-8 shadow-2xl relative z-10">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-900 border border-law-gold text-law-gold mb-4 text-2xl">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <h1 class="font-serif-premium text-2xl font-bold tracking-wide text-law-gold">LEX IMPERIUM</h1>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest">Legal Practice Management</p>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Firm Email Address</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-law-gold transition-colors" placeholder="lawyer@firm.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-law-gold transition-colors" placeholder="••••••••">
+                    </div>
+                </div>
+                <div id="login-error" class="text-xs text-rose-400 hidden flex items-center gap-2 bg-rose-950/30 border border-rose-900/50 p-3 rounded-lg">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="error-message-text">Invalid credentials or account not invited via Supabase Auth.</span>
+                </div>
+                <button type="submit" class="w-full py-3 bg-law-gold text-slate-950 font-semibold rounded-lg text-sm tracking-wide transition-all hover:bg-[#b3946c] active:scale-[0.99] flex items-center justify-center gap-2">
+                    <span>Secure Access Portal</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <span class="text-xs text-slate-500 block"><i class="fa-solid fa-shield-halved text-law-gold mr-1"></i> Row Level Security Enforced</span>
+            </div>
+        </div>
     </div>
 
-    <div class="field">
-      <input id="password" type="password" placeholder="Password">
+    <div id="app-layout" class="hidden min-h-screen flex flex-col md:flex-row">
+        
+        <aside class="w-full md:w-64 bg-law-navy border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between shrink-0">
+            <div>
+                <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-scale-gavel text-law-gold text-xl"></i>
+                        <div>
+                            <h2 class="font-serif-premium text-sm font-bold tracking-wider text-law-gold">LEX IMPERIUM</h2>
+                            <p class="text-[10px] text-emerald-400 uppercase tracking-widest flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Protected
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-white">
+                        <i id="menu-icon" class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+
+                <nav id="sidebar-nav" class="hidden md:block p-4 space-y-1">
+                    <button onclick="switchView('dashboard')" data-view="dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchView('clients')" data-view="clients" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i> <span>Clients</span>
+                    </button>
+                    <button onclick="switchView('cases')" data-view="cases" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-briefcase w-5 text-center"></i> <span>Cases Portfolio</span>
+                    </button>
+                    <button onclick="switchView('hearings')" data-view="hearings" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-gavel w-5 text-center"></i> <span>Hearings Docket</span>
+                    </button>
+                    <button onclick="switchView('documents')" data-view="documents" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-folder-open w-5 text-center"></i> <span>Vault Documents</span>
+                    </button>
+                    <button onclick="switchView('settings')" data-view="settings" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-900 hover:text-white">
+                        <i class="fa-solid fa-sliders w-5 text-center"></i> <span>Settings</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 space-y-3 bg-slate-950/50">
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-8 h-8 rounded-full bg-law-gold text-slate-950 font-bold flex items-center justify-center text-xs" id="lawyer-avatar">
+                        ??
+                    </div>
+                    <div class="truncate">
+                        <p class="text-xs font-semibold text-slate-200 truncate" id="lawyer-email-display">lawyer@firm.com</p>
+                        <p class="text-[10px] text-slate-500 uppercase">Authenticated User</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase text-rose-400 hover:bg-rose-950/20 transition-all">
+                    <i class="fa-solid fa-power-off w-5 text-center"></i> <span>Exit Workspace</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 bg-law-navy p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+            
+            <div id="global-loading" class="hidden space-y-6 animate-pulse">
+                <div class="h-8 bg-slate-800 rounded w-1/4"></div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="h-28 bg-slate-800 rounded-xl"></div>
+                    <div class="h-28 bg-slate-800 rounded-xl"></div>
+                    <div class="h-28 bg-slate-800 rounded-xl"></div>
+                    <div class="h-28 bg-slate-800 rounded-xl"></div>
+                </div>
+                <div class="h-64 bg-slate-800 rounded-xl"></div>
+            </div>
+
+            <div id="view-container">
+                </div>
+        </main>
     </div>
 
-    <button class="btn btn-primary" onclick="signup()">Signup</button>
-    <button class="btn btn-primary" onclick="login()">Login</button>
-
-    <div class="msg" id="msg"></div>
-
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-
-  <div class="topbar">
-    <h3>LexDesk</h3>
-    <button class="btn btn-danger" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="main-content">
-
-    <div class="card">
-      <h3>Add Case</h3>
-
-      <input id="name" placeholder="Client Name">
-      <input id="caseType" placeholder="Case Type">
-      <input id="status" placeholder="Status">
-
-      <button class="btn btn-gold" onclick="insertCase()">Add</button>
-
-      <h3>Your Cases</h3>
-      <div id="cases"></div>
+    <div id="modal-wrapper" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div id="modal-content" class="w-full max-w-lg bg-law-card border border-slate-800 rounded-xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            </div>
     </div>
 
-    <div class="card">
-      <h3>Overview</h3>
-      <canvas id="caseChart"></canvas>
-    </div>
 
-  </div>
-</div>
+    <script>
+        // --- SUPABASE LIVE CONNECTION CONFIGURATION ---
+        const SUPABASE_URL = 'https://trffszwncbswfsblftzr.supabase.co'; // <-- Replace with your real Supabase Project URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyZmZzenduY2Jzd2ZzYmxmdHpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjMzMjEsImV4cCI6MjA5NjEzOTMyMX0.Pk7bk4hzDdGM9vjyHunBiRuB7Aa77iuKY8pe7i1TCJY'; // <-- Replace with your real Project API Anon Key
 
-<script>
+        // Initialize Supabase Client
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const SUPABASE_URL = "https://icubannrfuawithpnxil.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdWJhbm5yZnVhd2l0aHBueGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzAwNjAsImV4cCI6MjA5NTY0NjA2MH0.o7lSAIWmR_k5dOJr2u-1I3swDkzWQw56Z0EypzAhg6c";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+        let currentView = 'dashboard';
 
-/* MESSAGE */
-function showMsg(text,type='error'){
-  const el=document.getElementById('msg');
-  el.textContent=text;
-  el.className='msg show '+type;
-}
+        // Listen to Auth State persistence lifecycle automatically on browser start
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            
+            // [UPDATED] 1. Detect if the user just arrived from an email invitation link
+            const urlParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+            const isInviteLink = urlParams.has('access_token') && urlParams.get('type') === 'invite';
 
-/* ✅ SIGNUP (ALLOWLIST REMOVED COMPLETELY) */
-async function signup(){
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
+            if (isInviteLink) {
+                // Prompt them to create a secure password right away
+                const newPassword = prompt("Welcome to LexImperium! Please establish your secure portal password:");
+                if (newPassword) {
+                    const { error: updateError } = await supabaseClient.auth.updateUser({ password: newPassword });
+                    if (updateError) {
+                        alert("Password configuration failed: " + updateError.message);
+                    } else {
+                        alert("Account secured successfully! Welcome to your workspace.");
+                    }
+                }
+            }
 
-  if(!email||!password){
-    showMsg("Fill all fields");
-    return;
-  }
+            // 2. Layout routing logic
+            if (session && session.user) {
+                currentUser = { email: session.user.email, id: session.user.id };
+                initApp();
+            } else {
+                document.getElementById('auth-page').classList.remove('hidden');
+                document.getElementById('app-layout').classList.add('hidden');
+            }
+        });
 
-  const {error}=await sb.auth.signUp({
-    email,
-    password
-  });
+        // ================= AUTHENTICATION LOGIC =================
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errBox = document.getElementById('login-error');
+            const errText = document.getElementById('error-message-text');
 
-  if(error){
-    showMsg(error.message);
-    return;
-  }
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
 
-  showMsg("Signup successful! Check email confirmation","success");
-}
+            if (error) {
+                errBox.classList.remove('hidden');
+                errText.innerHTML = error.message;
+                return;
+            }
 
-/* LOGIN */
-async function login(){
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
+            currentUser = {
+                email: data.user.email,
+                id: data.user.id
+            };
 
-  const {data,error}=await sb.auth.signInWithPassword({
-    email,password
-  });
+            initApp();
+        }
 
-  if(error){
-    showMsg(error.message);
-    return;
-  }
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            document.getElementById('auth-page').classList.remove('hidden');
+            document.getElementById('app-layout').classList.add('hidden');
+        }
 
-  document.getElementById('authBox').style.display='none';
-  document.getElementById('app').style.display='block';
+        function initApp() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('app-layout').classList.remove('hidden');
+            document.getElementById('lawyer-email-display').innerText = currentUser.email;
+            document.getElementById('lawyer-avatar').innerText = currentUser.email.substring(0, 2).toUpperCase();
+            switchView('dashboard');
+        }
 
-  loadCases();
-}
+        function toggleMobileMenu() {
+            const nav = document.getElementById('sidebar-nav');
+            const icon = document.getElementById('menu-icon');
+            if(nav.classList.contains('hidden')) {
+                nav.classList.remove('hidden');
+                icon.className = "fa-solid fa-xmark text-xl";
+            } else {
+                nav.classList.add('hidden');
+                icon.className = "fa-solid fa-bars text-xl";
+            }
+        }
 
-/* LOGOUT */
-async function logout(){
-  await sb.auth.signOut();
-  location.reload();
-}
+        // ================= ROUTING MODULE VIEW RENDERING =================
+        async function switchView(viewName) {
+            currentView = viewName;
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-view') === viewName) {
+                    btn.classList.add('bg-slate-900', 'text-white', 'border-l-2', 'border-law-gold');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'text-white', 'border-l-2', 'border-law-gold');
+                    btn.classList.add('text-slate-400');
+                }
+            });
 
-/* INSERT CASE */
-async function insertCase(){
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar-nav').classList.add('hidden');
+                document.getElementById('menu-icon').className = "fa-solid fa-bars text-xl";
+            }
 
-  const {data:user}=await sb.auth.getUser();
+            const container = document.getElementById('view-container');
+            const loading = document.getElementById('global-loading');
+            
+            container.innerHTML = '';
+            loading.classList.remove('hidden');
 
-  const name=document.getElementById('name').value;
-  const caseType=document.getElementById('caseType').value;
-  const status=document.getElementById('status').value;
+            // Fetch structural data asynchronously from live database views
+            switch(viewName) {
+                case 'dashboard': await renderDashboard(); break;
+                case 'clients': await renderClients(); break;
+                case 'cases': await renderCases(); break;
+                case 'hearings': await renderHearings(); break;
+                case 'documents': await renderDocuments(); break;
+                case 'settings': renderSettings(); break;
+            }
+            loading.classList.add('hidden');
+        }
 
-  await sb.from('clients').insert([{
-    name,
-    case_type:caseType,
-    status,
-    user_id:user.user.id
-  }]);
+        // ================= DASHBOARD MODULE =================
+        async function renderDashboard() {
+            const { data: clients } = await supabaseClient.from('clients').select('*');
+            const { data: cases } = await supabaseClient.from('cases').select('*');
+            const { data: hearings } = await supabaseClient.from('hearings').select('*');
 
-  loadCases();
-}
+            const totalClients = clients ? clients.length : 0;
+            const totalCases = cases ? cases.length : 0;
+            const pendingCases = cases ? cases.filter(c => c.status === 'Pending').length : 0;
+            const activeCases = cases ? cases.filter(c => c.status === 'Active').length : 0;
+            const closedCases = cases ? cases.filter(c => c.status === 'Closed').length : 0;
+            const upcomingHearings = hearings ? hearings.length : 0;
 
-/* LOAD CASES */
-async function loadCases(){
+            let upcomingHearingsHTML = '';
+            if (!hearings || hearings.length === 0) {
+                upcomingHearingsHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No upcoming hearings found on the calendar.</p>`;
+            } else {
+                const sorted = [...hearings].sort((a,b) => new Date(a.hearing_date) - new Date(b.hearing_date));
+                sorted.forEach(h => {
+                    const dt = new Date(h.hearing_date);
+                    upcomingHearingsHTML += `
+                        <div class="flex items-center justify-between p-3.5 bg-slate-950/40 border border-slate-800/60 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-amber-950/40 text-law-gold border border-amber-900/40 rounded-lg text-xs font-bold text-center w-12 shrink-0">
+                                    ${dt.toLocaleString('en-US', { month: 'short' })}<br>${dt.getDate()}
+                                </div>
+                                <div class="truncate">
+                                    <h4 class="text-sm font-semibold text-slate-200 truncate">${h.court_name}</h4>
+                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock text-law-gold mr-1"></i> ${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
 
-  const {data:user}=await sb.auth.getUser();
+            document.getElementById('view-container').innerHTML = `
+                <div class="mb-6">
+                    <h1 class="font-serif-premium text-2xl md:text-3xl font-bold text-law-gold">Command Center Overview</h1>
+                    <p class="text-xs text-slate-400 mt-1">Real-time status updates from live Row-Level-Security (RLS) database architecture.</p>
+                </div>
 
-  const {data}=await sb.from('clients')
-    .select('*')
-    .eq('user_id',user.user.id);
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-law-card border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                        <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Clients</p><h3 class="text-2xl font-bold mt-2 text-slate-100">${totalClients}</h3></div>
+                        <div class="text-2xl text-law-gold bg-slate-900/80 p-3 rounded-lg border border-slate-800"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                    <div class="bg-law-card border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                        <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Active Portfolio</p><h3 class="text-2xl font-bold mt-2 text-blue-400">${activeCases}</h3></div>
+                        <div class="text-2xl text-blue-400 bg-slate-900/80 p-3 rounded-lg border border-slate-800"><i class="fa-solid fa-folder-open"></i></div>
+                    </div>
+                    <div class="bg-law-card border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                        <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Pending Review</p><h3 class="text-2xl font-bold mt-2 text-yellow-500">${pendingCases}</h3></div>
+                        <div class="text-2xl text-yellow-500 bg-slate-900/80 p-3 rounded-lg border border-slate-800"><i class="fa-solid fa-hourglass-half"></i></div>
+                    </div>
+                    <div class="bg-law-card border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                        <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docket Hearings</p><h3 class="text-2xl font-bold mt-2 text-amber-500">${upcomingHearings}</h3></div>
+                        <div class="text-2xl text-amber-500 bg-slate-900/80 p-3 rounded-lg border border-slate-800"><i class="fa-solid fa-gavel"></i></div>
+                    </div>
+                </div>
 
-  const box=document.getElementById('cases');
-  box.innerHTML="";
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-law-card border border-slate-800 rounded-xl p-6">
+                        <h3 class="font-serif-premium text-base font-bold text-slate-200 mb-4">Database Record Breakdown</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs text-slate-300 mb-1.5"><span>Active Litigation Track</span><span>${activeCases} / ${totalCases}</span></div>
+                                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full dynamic-bar" style="width: ${totalCases ? (activeCases/totalCases)*100 : 0}%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-slate-300 mb-1.5"><span>Awaiting Motion (Pending)</span><span>${pendingCases} / ${totalCases}</span></div>
+                                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden"><div class="bg-yellow-500 h-full dynamic-bar" style="width: ${totalCases ? (pendingCases/totalCases)*100 : 0}%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-slate-300 mb-1.5"><span>Closed Records</span><span>${closedCases} / ${totalCases}</span></div>
+                                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full dynamic-bar" style="width: ${totalCases ? (closedCases/totalCases)*100 : 0}%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-law-card border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
+                        <div><h3 class="font-serif-premium text-base font-bold text-slate-200 mb-4">Court Agenda</h3><div class="space-y-3">${upcomingHearingsHTML}</div></div>
+                        <button onclick="switchView('hearings')" class="w-full mt-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-law-gold font-medium">Manage Full Calendar</button>
+                    </div>
+                </div>
+            `;
+        }
 
-  let active=0,pending=0,closed=0;
+        // ================= CLIENTS MODULE =================
+        let clientSearchQuery = "";
 
-  data.forEach(c=>{
+        async function renderClients() {
+            let query = supabaseClient.from('clients').select('*');
+            
+            if(clientSearchQuery) {
+                query = query.ilike('client_name', `%${clientSearchQuery}%`);
+            }
+            
+            const { data, error } = await query;
 
-    if(c.status==='Active') active++;
-    else if(c.status==='Pending') pending++;
-    else closed++;
+            let tableRows = '';
+            if(!data || data.length === 0) {
+                tableRows = `<tr><td colspan="3" class="text-center p-8 text-xs text-slate-500 italic">No Client Records Discovered.</td></tr>`;
+            } else {
+                data.forEach(c => {
+                    tableRows += `
+                        <tr class="border-b border-slate-900 hover:bg-slate-950/30">
+                            <td class="px-6 py-4 text-sm font-medium text-slate-200">${c.client_name}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400 font-mono">${c.phone}</td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button onclick="openClientModal('${c.id}', '${escape(c.client_name)}', '${c.phone}')" class="text-xs bg-slate-900 border border-slate-800 text-slate-300 px-2.5 py-1.5 rounded"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteClient('${c.id}')" class="text-xs bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
 
-    box.innerHTML+=`
-      <div class="case-card">
-        <b>${c.name}</b><br>
-        ${c.case_type} - ${c.status}
-      </div>
-    `;
-  });
+            document.getElementById('view-container').innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div><h1 class="font-serif-premium text-2xl font-bold text-law-gold">Client Database Matrix</h1></div>
+                    <button onclick="openClientModal()" class="px-4 py-2.5 bg-law-gold text-slate-950 font-semibold rounded-lg text-xs tracking-wider uppercase">Onboard New Client</button>
+                </div>
+                <div class="bg-law-card border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+                    <div class="p-4 bg-slate-950/40 border-b border-slate-800">
+                        <input type="text" value="${clientSearchQuery}" oninput="searchClients(this.value)" class="w-full max-w-xs pl-4 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none" placeholder="Search client directory...">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-950 text-[10px] uppercase font-semibold text-slate-400 border-b border-slate-800">
+                                <tr><th class="px-6 py-3">Client Corporate/Individual Title</th><th class="px-6 py-3">Secure Phone String</th><th class="px-6 py-3 text-right">Actions</th></tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
 
-  renderChart(active,pending,closed);
-}
+        function searchClients(val) { clientSearchQuery = val; renderClients(); }
 
-/* CHART */
-function renderChart(a,p,c){
+        function openClientModal(id = '', name = '', phone = '') {
+            const isEdit = id !== '';
+            const content = `
+                <div class="p-5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                    <h3 class="font-serif-premium font-bold text-slate-200">${isEdit ? 'Modify Secured Client File' : 'Establish New Client Onboarding'}</h3>
+                    <button onclick="closeModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form onsubmit="saveClient(event, '${id}')" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Full Name / Corporate Title</label>
+                        <input type="text" id="form-client-name" value="${unescape(name)}" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-law-gold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Phone Line</label>
+                        <input type="text" id="form-client-phone" value="${phone}" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-law-gold">
+                    </div>
+                    <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs text-slate-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-law-gold text-slate-950 font-semibold rounded text-xs uppercase">Commit to Vault</button>
+                    </div>
+                </form>
+            `;
+            showModal(content);
+        }
 
-  new Chart(document.getElementById('caseChart'),{
-    type:'doughnut',
-    data:{
-      labels:['Active','Pending','Closed'],
-      datasets:[{
-        data:[a,p,c],
-        backgroundColor:['#16a34a','#d97706','#94a3b8']
-      }]
-    }
-  });
-}
+        async function saveClient(e, id) {
+            e.preventDefault();
+            const name = document.getElementById('form-client-name').value.trim();
+            const phone = document.getElementById('form-client-phone').value.trim();
 
-/* AUTO SESSION */
-sb.auth.getSession().then(({data})=>{
-  if(data.session){
-    document.getElementById('authBox').style.display='none';
-    document.getElementById('app').style.display='block';
-    loadCases();
-  }
-});
+            if (id && id !== 'null' && id !== '') {
+                await supabaseClient.from('clients').update({ client_name: name, phone: phone }).eq('id', id);
+            } else {
+                await supabaseClient.from('clients').insert([{ user_id: currentUser.id, client_name: name, phone: phone }]);
+            }
+            closeModal();
+            await renderClients();
+        }
 
-</script>
+        async function deleteClient(id) {
+            if(confirm("Confirm destructive erasure of this client configuration model?")) {
+                await supabaseClient.from('clients').delete().eq('id', id);
+                await renderClients();
+            }
+        }
 
+        // ================= CASES PORTFOLIO MODULE =================
+        let caseSearchQuery = "";
+        let caseStatusFilter = "All";
+
+        async function renderCases() {
+            let query = supabaseClient.from('cases').select('*');
+
+            if(caseStatusFilter !== "All") {
+                query = query.eq('status', caseStatusFilter);
+            }
+            if(caseSearchQuery) {
+                query = query.ilike('case_title', `%${caseSearchQuery}%`);
+            }
+
+            const { data } = await query;
+
+            let tableRows = '';
+            if(!data || data.length === 0) {
+                tableRows = `<tr><td colspan="5" class="text-center p-8 text-xs text-slate-500 italic">No legal case folders located.</td></tr>`;
+            } else {
+                data.forEach(c => {
+                    let badgeColor = "bg-yellow-950/50 text-yellow-500 border-yellow-900/50";
+                    if(c.status === "Active") badgeColor = "bg-blue-950/50 text-blue-400 border-blue-900/50";
+                    if(c.status === "Closed") badgeColor = "bg-emerald-950/50 text-emerald-400 border-emerald-900/50";
+
+                    tableRows += `
+                        <tr class="border-b border-slate-900 hover:bg-slate-950/30">
+                            <td class="px-6 py-4 text-xs font-mono font-bold text-law-gold">${c.case_number}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-slate-200">${c.case_title}</td>
+                            <td class="px-6 py-4 text-xs text-slate-400">${c.case_date}</td>
+                            <td class="px-6 py-4 text-xs">
+                                <span class="px-2.5 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${badgeColor}">${c.status}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button onclick="openCaseModal('${c.id}', '${c.case_number}', '${escape(c.case_title)}', '${c.case_date}', '${c.status}')" class="text-xs bg-slate-900 border border-slate-800 text-slate-300 px-2.5 py-1.5 rounded"><i class="fa-solid fa-scale-unbalanced"></i> Modify</button>
+                                <button onclick="deleteCase('${c.id}')" class="text-xs bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-1.5 rounded"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById('view-container').innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div><h1 class="font-serif-premium text-2xl font-bold text-law-gold">Litigation Matrix & Cases Portfolio</h1></div>
+                    <button onclick="openCaseModal()" class="px-4 py-2.5 bg-law-gold text-slate-950 font-semibold rounded-lg text-xs uppercase">Initialize Action Folder</button>
+                </div>
+                <div class="bg-law-card border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+                    <div class="p-4 bg-slate-950/40 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <input type="text" value="${caseSearchQuery}" oninput="searchCases(this.value)" class="w-full max-w-xs pl-4 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-300" placeholder="Search case titles...">
+                        <select onchange="filterCasesStatus(this.value)" class="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-lg p-2">
+                            <option value="All" ${caseStatusFilter === 'All' ? 'selected' : ''}>Show All Portfolios</option>
+                            <option value="Pending" ${caseStatusFilter === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Active" ${caseStatusFilter === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="Closed" ${caseStatusFilter === 'Closed' ? 'selected' : ''}>Closed</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-950 text-[10px] uppercase font-semibold text-slate-400 border-b border-slate-800">
+                                <tr><th>Docket Number</th><th>Action Case Title</th><th>Filing Date</th><th>Status Block</th><th class="text-right">Operations Mapping</th></tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function searchCases(val) { caseSearchQuery = val; renderCases(); }
+        function filterCasesStatus(val) { caseStatusFilter = val; renderCases(); }
+
+        function openCaseModal(id = '', number = '', title = '', date = '', status = 'Pending') {
+            const isEdit = id !== '';
+            const content = `
+                <div class="p-5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                    <h3 class="font-serif-premium font-bold text-slate-200">${isEdit ? 'Correct/Modify Strategic Case' : 'Establish New Case File'}</h3>
+                    <button onclick="closeModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form onsubmit="saveCase(event, '${id}')" class="p-6 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Docket Number</label>
+                            <input type="text" id="form-case-number" value="${number}" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Filing Date</label>
+                            <input type="date" id="form-case-date" value="${date}" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Action Title Nomenclature</label>
+                        <input type="text" id="form-case-title" value="${unescape(title)}" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Status Designation</label>
+                        <select id="form-case-status" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200">
+                            <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Active" ${status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="Closed" ${status === 'Closed' ? 'selected' : ''}>Closed</option>
+                        </select>
+                    </div>
+                    <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs text-slate-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-law-gold text-slate-950 font-semibold rounded text-xs uppercase">Commit Changes</button>
+                    </div>
+                </form>
+            `;
+            showModal(content);
+        }
+
+        async function saveCase(e, id) {
+            e.preventDefault();
+            const num = document.getElementById('form-case-number').value.trim();
+            const title = document.getElementById('form-case-title').value.trim();
+            const date = document.getElementById('form-case-date').value;
+            const status = document.getElementById('form-case-status').value;
+
+            if(id && id !== 'null' && id !== '') {
+                await supabaseClient.from('cases').update({ case_number: num, case_title: title, case_date: date, status: status }).eq('id', id);
+            } else {
+                await supabaseClient.from('cases').insert([{ user_id: currentUser.id, case_number: num, case_title: title, case_date: date, status: status }]);
+            }
+            closeModal();
+            await renderCases();
+        }
+
+        async function deleteCase(id) {
+            if(confirm("Confirm deletion of this database record row?")) {
+                await supabaseClient.from('cases').delete().eq('id', id);
+                await renderCases();
+            }
+        }
+
+        // ================= HEARINGS MODULE =================
+        async function renderHearings() {
+            const { data } = await supabaseClient.from('hearings').select('*');
+            let agendaListHTML = '';
+
+            if(!data || data.length === 0) {
+                agendaListHTML = `<div class="text-center p-8 bg-law-card border border-slate-800 rounded-xl text-xs text-slate-500 italic">No scheduled hearings mapped to this project layer.</div>`;
+            } else {
+                const sorted = [...data].sort((a,b) => new Date(a.hearing_date) - new Date(b.hearing_date));
+                sorted.forEach(h => {
+                    const dt = new Date(h.hearing_date);
+                    agendaListHTML += `
+                        <div class="bg-law-card border border-slate-800 p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-slate-950 border border-law-gold/30 text-law-gold px-4 py-2.5 rounded-xl text-center min-w-[70px]">
+                                    <p class="text-xs uppercase font-bold tracking-wider">${dt.toLocaleString('en-US', { month: 'short' })}</p>
+                                    <p class="text-xl font-extrabold">${dt.getDate()}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-semibold text-slate-200">${h.court_name}</h3>
+                                    <p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-clock text-law-gold mr-1"></i> ${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openHearingModal('${h.id}', '${h.hearing_date}', '${escape(h.court_name)}')" class="text-xs bg-slate-950 border border-slate-800 text-slate-300 px-3 py-2 rounded font-medium">Reschedule</button>
+                                <button onclick="deleteHearing('${h.id}')" class="text-xs bg-slate-950 border border-slate-800 text-slate-500 px-3 py-2 rounded"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('view-container').innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div><h1 class="font-serif-premium text-2xl font-bold text-law-gold">Hearings & Master Docket</h1></div>
+                    <button onclick="openHearingModal()" class="px-4 py-2.5 bg-law-gold text-slate-950 font-semibold rounded-lg text-xs uppercase">Log Hearing Date</button>
+                </div>
+                <div class="space-y-3">${agendaListHTML}</div>
+            `;
+        }
+
+        function openHearingModal(id = '', date = '', court = '') {
+            const isEdit = id !== '';
+            const content = `
+                <div class="p-5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                    <h3 class="font-serif-premium font-bold text-slate-200">${isEdit ? 'Re-schedule Hearing Date Constraints' : 'Add New Court Event Entry'}</h3>
+                    <button onclick="closeModal()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form onsubmit="saveHearing(event, '${id}')" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Hearing Date & Time</label>
+                        <input type="datetime-local" id="form-hearing-date" value="${date}" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] uppercase text-slate-400 mb-1.5">Court Jurisdiction Designation</label>
+                        <input type="text" id="form-hearing-court" value="${unescape(court)}" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200">
+                    </div>
+                    <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs text-slate-400">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-law-gold text-slate-950 font-semibold rounded text-xs uppercase">Confirm Booking</button>
+                    </div>
+                </form>
+            `;
+            showModal(content);
+        }
+
+        async function saveHearing(e, id) {
+            e.preventDefault();
+            const date = document.getElementById('form-hearing-date').value;
+            const court = document.getElementById('form-hearing-court').value.trim();
+
+            if(id && id !== 'null' && id !== '') {
+                await supabaseClient.from('hearings').update({ hearing_date: date, court_name: court }).eq('id', id);
+            } else {
+                await supabaseClient.from('hearings').insert([{ user_id: currentUser.id, hearing_date: date, court_name: court }]);
+            }
+            closeModal();
+            await renderHearings();
+        }
+
+        async function deleteHearing(id) {
+            if(confirm("Expunge this target hearing date completely?")) {
+                await supabaseClient.from('hearings').delete().eq('id', id);
+                await renderHearings();
+            }
+        }
+
+        // ================= DOCUMENTS MODULE (SUPABASE STORAGE BUCKET) =================
+        async function renderDocuments() {
+            const { data, error } = await supabaseClient.from('documents').select('*');
+            let cardGridHTML = '';
+
+            if(!data || data.length === 0) {
+                cardGridHTML = `<div class="col-span-full text-center p-12 bg-law-card border border-slate-800 rounded-xl text-xs text-slate-500 italic">No files loaded into storage bucket 'case-documents' yet.</div>`;
+            } else {
+                data.forEach(d => {
+                    let fileIcon = "fa-file-lines text-slate-400";
+                    if(d.file_name.endsWith('.pdf')) fileIcon = "fa-file-pdf text-rose-500";
+                    if(d.file_name.endsWith('.docx') || d.file_name.endsWith('.doc')) fileIcon = "fa-file-word text-blue-500";
+                    if(d.file_name.endsWith('.png') || d.file_name.endsWith('.jpg')) fileIcon = "fa-file-image text-emerald-500";
+
+                    cardGridHTML += `
+                        <div class="bg-law-card border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl mt-0.5"><i class="fa-solid ${fileIcon}"></i></span>
+                                <div class="truncate">
+                                    <h4 class="text-xs font-semibold text-slate-200 truncate" title="${d.file_name}">${d.file_name}</h4>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Uploaded: ${d.created_at ? d.created_at.split('T')[0] : 'Recent'}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-900">
+                                <a href="${d.file_url}" target="_blank" class="text-[11px] bg-slate-950 border border-slate-800 text-slate-300 text-center py-1.5 rounded font-medium">Get File</a>
+                                <button onclick="deleteDocument('${d.id}', '${d.file_path}')" class="text-[11px] bg-slate-950 border border-slate-800 text-slate-500 py-1.5 rounded hover:text-rose-400">Erase</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('view-container').innerHTML = `
+                <div class="mb-6">
+                    <h1 class="font-serif-premium text-2xl font-bold text-law-gold">Secure Vault Storage Engine</h1>
+                    <p class="text-xs text-slate-400 mt-1">Direct storage sync configuration matching <span class="font-mono bg-slate-950 px-1.5 py-0.5 rounded text-slate-300">case-documents</span></p>
+                </div>
+                <div class="bg-law-card border border-dashed border-slate-700 rounded-xl p-6 mb-8 text-center">
+                    <i class="fa-solid fa-file-shield text-3xl text-law-gold/60 mb-3 block"></i>
+                    <h3 class="text-sm font-semibold text-slate-200">Transmit Document Matrix to Encrypted Server Bucket</h3>
+                    <div class="mt-4 max-w-xs mx-auto">
+                        <input type="file" id="bucket-file-input" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png" onchange="uploadFileToSupabase(event)">
+                        <button onclick="document.getElementById('bucket-file-input').click()" class="px-4 py-2 bg-slate-950 border border-slate-800 text-law-gold text-xs uppercase font-semibold rounded-lg tracking-wider">Browse File Vault</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">${cardGridHTML}</div>
+            `;
+        }
+
+        async function uploadFileToSupabase(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const allowedExtensions = /(\.pdf|\.doc|\.docx|\.jpg|\.png)$/i;
+            if(!allowedExtensions.exec(file.name)) {
+                alert("Security Error: Format mapping invalid.");
+                return;
+            }
+
+            const fileId = Date.now() + '_' + file.name;
+            
+            const { data: storageData, error: storageError } = await supabaseClient.storage
+                .from('case-documents')
+                .upload(fileId, file);
+
+            if(storageError) {
+                alert("Storage error: " + storageError.message);
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage.from('case-documents').getPublicUrl(fileId);
+
+            await supabaseClient.from('documents').insert([{
+                user_id: currentUser.id,
+                file_name: file.name,
+                file_path: fileId,
+                file_url: urlData.publicUrl
+            }]);
+
+            await renderDocuments();
+        }
+
+        async function deleteDocument(id, filePath) {
+            if(confirm("Confirm standard execution commands to purge this file payload object?")) {
+                await supabaseClient.storage.from('case-documents').remove([filePath]);
+                await supabaseClient.from('documents').delete().eq('id', id);
+                await renderDocuments();
+            }
+        }
+
+        // ================= SETTINGS INFO VIEW =================
+        function renderSettings() {
+            document.getElementById('view-container').innerHTML = `
+                <div class="mb-6">
+                    <h1 class="font-serif-premium text-2xl font-bold text-law-gold">System Infrastructure Matrix</h1>
+                </div>
+                <div class="bg-law-card border border-slate-800 rounded-xl p-6 space-y-4 max-w-2xl">
+                    <div>
+                        <h3 class="text-sm font-semibold text-law-gold uppercase tracking-wider text-xs">Supabase Connected Environment</h3>
+                        <p class="text-xs text-slate-400 mt-2">Core execution listeners are attached and monitored continuously using secure standard headers.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= GLOBAL MODAL MANAGEMENT =================
+        function showModal(htmlContent) {
+            const wrap = document.getElementById('modal-wrapper');
+            const inner = document.getElementById('modal-content');
+            inner.innerHTML = htmlContent;
+            wrap.classList.remove('hidden');
+            wrap.classList.add('flex');
+            setTimeout(() => { inner.classList.remove('scale-95', 'opacity-0'); inner.classList.add('scale-100', 'opacity-100'); }, 50);
+        }
+
+        function closeModal() {
+            const wrap = document.getElementById('modal-wrapper');
+            const inner = document.getElementById('modal-content');
+            inner.classList.remove('scale-100', 'opacity-100');
+            inner.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { wrap.classList.remove('flex'); wrap.classList.add('hidden'); }, 200);
+        }
+    </script>
 </body>
 </html>
