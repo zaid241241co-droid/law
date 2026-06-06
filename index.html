@@ -216,10 +216,8 @@
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email,
-                password   
+                password
             });
-            console.log("LOGIN DATA:", data);
-            console.log("LOGIN ERROR:", error);
 
             if (error) {
                 errBox.classList.remove('hidden');
