@@ -601,11 +601,39 @@
             const date = document.getElementById('form-case-date').value;
             const status = document.getElementById('form-case-status').value;
 
-            if(id && id !== 'null' && id !== '') {
-                await supabaseClient.from('cases').update({ case_number: num, case_title: title, case_date: date, status: status }).eq('id', id);
-            } else {
-                await supabaseClient.from('cases').insert([{ user_id: currentUser.id, case_number: num, case_title: title, case_date: date, status: status }]);
-            }
+            let result;
+
+if(id && id !== 'null' && id !== '') {
+
+    result = await supabaseClient
+    .from('cases')
+    .update({
+        case_number: num,
+        case_title: title,
+        case_date: date,
+        status: status
+    })
+    .eq('id', id);
+
+} else {
+
+    result = await supabaseClient
+    .from('cases')
+    .insert([{
+        user_id: currentUser.id,
+        case_number: num,
+        case_title: title,
+        case_date: date,
+        status: status
+    }]);
+}
+
+if(result.error){
+    alert("ERROR: " + result.error.message);
+    return;
+}
+
+alert("Case Saved Successfully");
             closeModal();
             await renderCases();
         }
