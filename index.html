@@ -802,8 +802,13 @@
                 </div>
                 <div class="bg-law-card border border-slate-800 rounded-xl p-6 space-y-4 max-w-2xl">
                     <div>
-                        <h3 class="text-sm font-semibold text-law-gold uppercase tracking-wider text-xs">Supabase Connected Environment</h3>
-                        <p class="text-xs text-slate-400 mt-2">Core execution listeners are attached and monitored continuously using secure standard headers.</p>
+                        <h3 class="text-sm font-semibold text-law-gold uppercase tracking-wider text-xs">Account Security</h3>
+                      <button
+                    onclick="testPassword()"
+                    class="mt-4 px-4 py-2 bg-law-gold text-slate-950 rounded-lg text-xs font-semibold"
+                >
+                    Create Password
+                </button>  
                     </div>
                 </div>
             `;
@@ -826,6 +831,22 @@
             inner.classList.add('scale-95', 'opacity-0');
             setTimeout(() => { wrap.classList.remove('flex'); wrap.classList.add('hidden'); }, 200);
         }
+        async function testPassword() {
+
+    const password = prompt("Enter a new password");
+
+    if (!password) return;
+
+    const { error } = await supabaseClient.auth.updateUser({
+        password: password
+    });
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        alert("Password created successfully!");
+    }
+}
     </script>
 </body>
 </html>
