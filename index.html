@@ -325,7 +325,7 @@
                                 </div>
                                 <div class="truncate">
                                     <h4 class="text-sm font-semibold text-slate-200 truncate">${h.court_name}</h4>
-                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock text-law-gold mr-1"></i> ${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock text-law-gold mr-1"></i> ${h.hearing_date.slice(11,16)}</p>
                                 </div>
                             </div>
                         </div>
@@ -637,15 +637,48 @@ alert("Case Saved Successfully");
             closeModal();
             await renderCases();
         }
-
+        let pendingDeleteCase = null;
+        let deleteTimer = null;
         async function deleteCase(id) {
             if(confirm("Confirm deletion of this database record row?")) {
+                const { data: caseData } = await supabaseClient
+               .from('cases')
+               .select('*')
+               .eq('id', id)
+               .single();
+
+            pendingDeleteCase = caseData;
                 await supabaseClient.from('cases').delete().eq('id', id);
                 await renderCases();
+                document.getElementById('undoBox').style.display = 'block';
+
+            clearTimeout(deleteTimer);
+
+            deleteTimer = setTimeout(() => {
+            pendingDeleteCase = null;
+            document.getElementById('undoBox').style.display = 'none';
+         }, 10000);
             }
         }
 
-        // ================= HEARINGS MODULE =================
+        async function undoDelete() {
+
+    if (!pendingDeleteCase) return;
+
+    await supabaseClient
+        .from('cases')
+        .insert([pendingDeleteCase]);
+
+    pendingDeleteCase = null;
+
+    document.getElementById('undoBox').style.display = 'none';
+
+    clearTimeout(deleteTimer);
+
+    await renderCases();
+}
+
+        
         async function renderHearings() {
             const { data } = await supabaseClient.from('hearings').select('*');
             let agendaListHTML = '';
@@ -732,7 +765,7 @@ alert("Case Saved Successfully");
             }
         }
 
-        // ================= DOCUMENTS MODULE (SUPABASE STORAGE BUCKET) =================
+        
         async function renderDocuments() {
             const { data, error } = await supabaseClient.from('documents').select('*');
             let cardGridHTML = '';
@@ -822,7 +855,7 @@ alert("Case Saved Successfully");
             }
         }
 
-        // ================= SETTINGS INFO VIEW =================
+        
         function renderSettings() {
             document.getElementById('view-container').innerHTML = `
                 <div class="mb-6">
@@ -842,7 +875,7 @@ alert("Case Saved Successfully");
             `;
         }
 
-        // ================= GLOBAL MODAL MANAGEMENT =================
+        
         function showModal(htmlContent) {
             const wrap = document.getElementById('modal-wrapper');
             const inner = document.getElementById('modal-content');
@@ -876,5 +909,27 @@ alert("Case Saved Successfully");
     }
 }
     </script>
+    <div id="undoBox" style="
+    display:none;
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#333;
+    color:white;
+    padding:12px;
+    border-radius:8px;
+    z-index:9999;
+">
+    Case deleted
+    <button onclick="undoDelete()" style="
+        margin-left:10px;
+        background:orange;
+        border:none;
+        padding:5px 10px;
+        cursor:pointer;
+    ">
+        UNDO
+    </button>
+</div>
 </body>
 </html>
