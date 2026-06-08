@@ -661,13 +661,22 @@ alert("Case Saved Successfully");
             }
         }
 
-        async function undoDelete() {
+       async function undoDelete() {
 
     if (!pendingDeleteCase) return;
 
-    await supabaseClient
+    const caseToRestore = { ...pendingDeleteCase };
+
+    delete caseToRestore.id;
+
+    const { error } = await supabaseClient
         .from('cases')
-        .insert([pendingDeleteCase]);
+        .insert([caseToRestore]);
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
 
     pendingDeleteCase = null;
 
